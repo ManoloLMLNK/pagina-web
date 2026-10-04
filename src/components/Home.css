@@ -1,0 +1,393 @@
+.home-page {
+
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    font-family: "Inter", system-ui, sans-serif;
+    color: #111111;
+
+}
+
+.home-header {
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    background: #fdf6d8;
+    border-bottom: 2px solid #111;
+    gap: 16px;
+
+}
+
+.menu-toggle {
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: #111;
+    cursor: pointer;
+
+}
+
+.menu-icon {
+
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+
+}
+
+.menu-icon span {
+
+    width: 22px;
+    height: 2px;
+    background: #111;
+    display: block;
+
+}
+
+.brand {
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-direction: column;
+
+}
+
+.brand-logo {
+
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #5f4b8b;
+    display: grid;
+    place-content: center;
+    font-size: 1.5rem;
+    background: #fff;
+}
+
+.brand-name {
+
+    font-family: "IBM Plex Serif", Georgia, serif;
+    color: #5f4b8b;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+
+}
+
+.account {
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+}
+
+.icon-button {
+
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+
+}
+
+.avatar {
+
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #5f4b8b;
+    color: #fff;
+    display: grid;
+    place-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+
+}
+
+.account-info {
+
+    display: flex;
+    flex-direction: column;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    white-space: nowrap;
+
+}
+
+.account-info span {
+
+    color: #7a7a80;
+    font-size: 0.75rem;
+
+}
+
+.search-bar {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 32px;
+    background: #f4f3fb;
+
+}
+
+.search-bar input {
+
+    flex: 1;
+    max-width: 640px;
+    height: 42px;
+    padding: 0 18px;
+    border: 1px solid #ececf0;
+    font: inherit;
+
+}
+
+.search-bar button {
+
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid #ececf0;
+    background: #fff;
+    cursor: pointer;
+    flex-shrink: 0;
+
+}
+
+.home.content {
+
+    flex: 1;
+    padding: 24px 32px 48px;
+
+}
+
+.section-title {
+
+    font-family: "IBM Plex Serif", Georgia, serif;
+    color: #5f4b8b;
+    font-weight: 500;
+    margin: 24px 0 12px;
+
+}
+
+.section-header {
+
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+
+}
+
+.see-more {
+
+    font-size: 0.85rem;
+    color: #5f4b8b;
+    white-space: nowrap;
+
+}
+
+.category-tabs {
+
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+
+}
+
+.tab {
+
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: none;
+    background: #ececf0;
+    color: #111;
+    font: inherit;
+    cursor: pointer;
+
+}
+
+.tab.active {
+
+    background: #5f4b8b;
+    color: #fff;
+
+}
+
+.category-row {
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+
+}
+
+.category-item {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+
+}
+
+.category-icon {
+
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: #f4f3fb;
+    display: grid;
+    place-content: center;
+    font-size: 1.6rem;
+
+}
+
+.category-item.placeholder {
+
+    height: 90px;
+    border-radius: 12px;
+    background: #f4f3fb;
+
+}
+
+.card-row {
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    margin-bottom: 8px;
+
+}
+
+.card {
+
+    border: 1px solid #ececf0;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 170px;
+
+}
+
+.card.placeholder {
+
+    background: #fafafa;
+
+}
+
+.card-image {
+
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: #f0f0f0;
+
+}
+
+.card-name {
+
+    margin: 0;
+    font-size: 0.85rem;
+    color: #5f4b8b
+
+}
+
+.card-rating {
+
+    font-size: 0.75rem;
+    color: #7a7a80;
+    margin: 0;
+
+}
+
+.card-footer {
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+
+}
+
+.card-price {
+
+    font-weight: 600;
+    font-size: 0.9rem;
+
+}
+
+.add-to-cart {
+
+    background: #5f4b8b;
+    border: none;
+    color: #fff;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+
+}
+
+.cart-button {
+
+    position: fixed;
+    right: 24px;
+    bottom: 72px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #5f4b8b;
+    color: #fff;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    z-index: 10;
+
+}
+
+.home-footer {
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 32px;
+    background: #fdf6d8;
+    font-size: 0.85rem;
+    border-top: 1px solid #ececf0;
+
+}
+
+@media (max-width: 700px) {
+
+    .home-header,
+    .search-bar,
+    .home-content,
+    .home-footer {
+
+        padding-left: 16px;
+        padding-right: 16px;
+
+    }
+
+    .account-info {
+
+        display: none;
+
+    }
+
+}

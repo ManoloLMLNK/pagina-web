@@ -1,0 +1,19 @@
+.checkout-screen {
+
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    background: #f8f7fc;
+
+}
+
+.checkout-screen__card {
+
+    width: 100%;
+    max-width: 420px;
+    padding: 32px 24px;
+    border-radius: 16px !important;
+
+}

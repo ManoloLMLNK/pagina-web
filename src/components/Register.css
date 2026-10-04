@@ -1,0 +1,46 @@
+.register-card {
+
+    min-height: 0;
+    padding: 56px 24px;
+
+}
+
+.register-card .login-title {
+
+    margin-bottom: 40px;
+
+}
+
+.register-card .field {
+
+    margin-bottom: 14px;
+
+}
+
+.register-card .login-button {
+
+    margin-top: 28px;
+
+}
+
+.register-card .register {
+
+    margin-top: 32px;
+
+}
+
+@media (max-width: 600px) {
+
+    .register-card {
+
+        padding: 40px 20px;
+
+    }
+
+    .register-card .login-title {
+
+        margin-bottom: 32px;
+
+    }
+
+}

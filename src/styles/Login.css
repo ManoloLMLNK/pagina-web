@@ -1,0 +1,92 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500&family=Inter:wght@400;500&display=swap");
+
+.login-screen {
+
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+
+}
+
+.login-screen__card {
+
+    width: 100%;
+    max-width: 890px;
+    min-height: 720px;
+    padding: 64px 24px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.22);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.login-brand__title {
+
+    margin: 0 0 88px;
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    letter-spacing: 0.01em;
+    color: #5f4b8b;
+    text-align: center;
+
+}
+
+.login-screen__from {
+
+    width: 100%;
+    max-width: 525px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+}
+
+.login-field__label {
+
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.05rem;
+
+}
+
+.remember-user {
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+
+}
+
+.login-screen__register {
+
+    margin: 36px 0 0;
+    text-align: center;
+    font-size: 1.05rem;
+
+}
+
+@media (max-width: 600px) {
+
+    .login-screen__card {
+
+        min-height: auto;
+        padding: 48px 20px;
+
+    }
+
+    .login-brand__title {
+
+        margin-bottom: 48px;
+
+    }
+
+}

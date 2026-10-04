@@ -1,0 +1,118 @@
+.sidebar-overlay {
+
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 40;
+
+}
+
+.sidebar-overlay.visible {
+
+    opacity: 1;
+    pointer-events: auto;
+
+}
+
+.sidebar {
+
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 260px;
+    height: 100%;
+    background: #5f4b8b;
+    color: #fff;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    transition: left 0.25s ease-in-out;
+    z-index: 50;
+
+}
+
+.sidebar.open {
+
+    left: 0;
+
+}
+
+.sidebar-close {
+
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+
+}
+
+.sidebar-greeting {
+
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.8rem;
+    margin: 0;
+
+}
+
+.sidebar-nav {
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+}
+
+.sidebar-link {
+
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 10px 16px;
+    border-radius: 8px;
+
+}
+
+.sidebar-link:hover {
+
+    background: rgba(255, 255, 255, 0.12);
+
+}
+
+.sidebar-divider {
+
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    margin: 4px 0;
+
+}
+
+.sidebar-logout {
+
+    margin-top: auto;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+
+}
+
+@media (max-width: 400px) {
+
+    .sidebar {
+
+        width: 220px;
+
+    }
+
+}
