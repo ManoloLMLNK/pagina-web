@@ -1,3 +1,6 @@
+//esta parte se puede borrar ya que ya se actualizo y mejoro esta parte
+//y ahora en lugar de mandarnos a otra "pagina" se superpone la parte de pago
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Paper } from "@mui/material";

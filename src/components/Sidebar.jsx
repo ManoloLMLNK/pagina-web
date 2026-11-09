@@ -1,32 +1,45 @@
-import { Link } from "react-router-dom"
-import"./Sidebar.css"
+import { NavLink } from "react-router-dom";
+import "./Sidebar.css";
 
-const BASE_LINKS = [
+//los enlaces del menu lateral segun el rol del usuario
+//"to" es la ruta a la que lleva y "label" el texto q se ve
 
-    {to: "/home", label: "inicio"},
-    {to: "/productos", label: "productos"},
-    {to: "/servicios", label: "servicios"}
-
-];
-
-const ROLE_LINKS = {
-
-    vendedor: [{to: "/mis-publicaciones", label: "mis publicaciones"}],
+const MENUS = {
 
     administrador: [
 
-        {to: "/usuarios", label: "usuarios"},
-        {to: "/administradores", label: "administradores"}
+        { to: "/home", label: "Inicio" },
+        { to: "/empresas", label: "Empresas" },
+        { to: "/clientes", label: "Clientes" },
+        { to: "/productos", label: "Productos" },
+        { to: "/servicios", label: "Servicios" },
+
+    ],
+
+    vendedor: [
+
+        { to: "/home", label: "Inicio" },
+        { to: "/productos", label: "Productos" },
+        { to: "/servicios", label: "Servicios" },
+        { to: "/mis-publicaciones", label: "Mis Publicaciones" },
+
+    ],
+
+    comprador: [
+
+        { to: "/home", label: "Inicio" },
+        { to: "/productos", label: "Productos" },
+        { to: "/servicios", label: "Servicios" },
 
     ],
 
 };
 
-export default function Sidebar ({open, onClose, currentUser, onLogout}) {
+export default function Sidebar({ open, onClose, currentUser, onLogout }) {
 
     const firstName = currentUser?.fullName?.split(" ")[0] || "";
 
-    const extraLinks = ROLE_LINKS[currentUser?.role] || [];
+    const links = MENUS[currentUser?.role] || MENUS.comprador;
 
     return (
 
@@ -34,56 +47,47 @@ export default function Sidebar ({open, onClose, currentUser, onLogout}) {
 
             <div
 
-                className = {`sidebar-overlay ${open ? "visible" : ""}`}
-
-                onClick = {onClose}
-
-                aria-hidden = "true"
+                className={`sidebar-overlay ${open ? "visible" : ""}`}
+                onClick={onClose}
+                aria-hidden="true"
 
             />
 
-            <aside className = {`sidebar ${open ? "open" : ""}`}>
-            
-                <button className = "sidebar-close" onClick = {onClose} aria-label = "cerrar menu">
-                
+
+            <aside className={`sidebar ${open ? "open" : ""}`}>
+
+                <button type="button" className="sidebar-close" onClick={onClose} aria-label="Cerrar menú">
+
                     x
 
                 </button>
 
-                <h2 className = "sidebar-greeting">
-                
-                    Hola{firstName ? `, ${firstName}` : ""}
+                <h2 className="sidebar-greeting">¡Hola{firstName ? `, ${firstName}` : ""}!</h2>
 
-                </h2>
+                <nav className="sidebar-nav">
 
-                <nav className = "sidebar-nav">
-                
-                    {BASE_LINKS.map((link) => (
+                    {links.map((link) => (
 
-                        <Link key = {link.to} to = {link.to} className = "sidebar-link" onClick = {onClose}>
+                        <NavLink
 
-                            {link.label}
+                            key={link.to}
+                            to={link.to}
+                            end={link.to === "/home"}
+                            onClick={onClose}
+                            className={({ isActive }) => `sidebar-link${isActive ? " sidebar-link--active" : ""}`}
 
-                        </Link>
-
-                    ))}
-
-                    {extraLinks.length > 0 && <hr className = "sidebar-divider" />}
-
-                    {extraLinks.map((link) => (
-
-                        <Link key = {link.to} to = {link.to} className = "sidebar-link" onClick = {onClose}>
+                        >
 
                             {link.label}
 
-                        </Link>
+                        </NavLink>
 
                     ))}
 
                 </nav>
 
-                <button className = "sidebar-logout" onClick = {onLogout}>
-                
+                <button type="button" className="sidebar-logout" onClick={onLogout}>
+
                     Cerrar sesión
 
                 </button>

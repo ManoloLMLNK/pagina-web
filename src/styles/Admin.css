@@ -1,0 +1,219 @@
+/*titulo + buscador + "+ Agregar"*/
+
+.list-toolbar {
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 32px;
+    background: #f4f3fb;
+
+}
+
+.list-toolbar__title {
+
+    margin: 0;
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-weight: 500;
+    font-size: 1.5rem;
+    color: #5f4b8b;
+
+}
+
+.list-toolbar__search {
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 1 380px;
+    min-width: 220px;
+
+}
+
+.list-toolbar__search input {
+
+    flex: 1;
+    min-width: 0;
+    height: 34px;
+    padding: 0 14px;
+    border: 1px solid #ececf0;
+    border-radius: 999px;
+    background: #ffffff;
+    font: inherit;
+    font-size: 0.85rem;
+
+}
+
+.list-toolbar__search button {
+
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid #ececf0;
+    border-radius: 999px;
+    background: #ffffff;
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+}
+
+.list-toolbar__add {
+
+    margin-left: auto;
+    height: 34px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 6px;
+    background: #5f4b8b;
+    color: #ffffff;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+}
+
+.list-toolbar__add:hover {
+
+    background: #4e3d75;
+
+}
+
+.data-table__wrapper {
+
+    overflow-x: auto;
+    border: 1px solid #d9d9e0;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+
+}
+
+.data-table {
+
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+
+}
+
+.data-table th,
+
+.data-table td {
+
+    padding: 8px 10px;
+    border: 1px solid #e1e1e8;
+    text-align: center;
+    white-space: nowrap;
+
+}
+
+.data-table tr > :first-child {
+
+    border-left: none;
+
+}
+
+.data-table tr > :last-child {
+
+    border-right: none;
+
+}
+
+.data-table thead th {
+
+    border-top: none;
+    color: #5f4b8b;
+    font-weight: 500;
+
+}
+
+.data-table tbody tr:last-child td {
+
+    border-bottom: none;
+
+}
+
+.data-table__index {
+
+    width: 48px;
+
+}
+
+.data-table tbody tr:hover:not(.data-table__filler) {
+
+    background: #faf9fe;
+
+}
+
+.data-table__filler td {
+
+    height: 34px;
+
+}
+
+.data-table__empty {
+
+    margin: 0;
+    padding: 16px;
+    text-align: center;
+    color: #7a7a80;
+
+}
+
+.form-field__label {
+
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+    color: #111111;
+
+}
+
+.form-field__required {
+
+    color: #d32f2f;
+
+}
+
+.form-grid {
+
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px 24px;
+
+}
+
+.form-grid--2 {
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+}
+
+.form-dialog__section {
+
+    margin: 24px -24px 16px;
+    padding: 8px 24px;
+    background: #fdf6d8;
+    font-size: 0.95rem;
+    font-weight: 500;
+
+}
+
+@media (max-width: 700px) {
+
+    .form-grid,
+
+    .form-grid--2 {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .list-toolbar {
+  
+        padding: 12px 16px;
+  
+    }
+
+}

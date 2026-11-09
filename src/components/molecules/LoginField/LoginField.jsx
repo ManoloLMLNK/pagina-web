@@ -3,7 +3,10 @@ import { IconButton, InputAdornment, TextField } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
-export default function LoginField ({
+//etiqueta + campo + mensaje de error
+//type="password" agrega solo el ojito para ver/ocultar la contrasena
+
+export default function LoginField({
 
     id,
     label,
@@ -20,11 +23,17 @@ export default function LoginField ({
 
     const isPassword = type === "password";
 
+    //a los campos de contraseña no se les pasa "value" si se le pasara,
+    //React escribiria la clave como atributo en el HTML y se veria al inspeccionar la
+    //pagina asi la clave vive solo dentro del campo
+
+    const valueProps = isPassword ? {} : { value };
+
     return (
 
-        <div className = "login-field">
+        <div className="login-field">
 
-            <label htmlFor = {id} className = "login-field__label">
+            <label htmlFor={id} className="login-field__label">
 
                 {label}
 
@@ -32,46 +41,47 @@ export default function LoginField ({
 
             <TextField
 
-                id = {id}
-                type = {isPassword && show ? "text" : type}
-                value = {value}
-                onChange = {onChange}
-                placeholder = {placeholder}
-                autoComplete = {autoComplete}
-                error = {Boolean(error)}
-                helperText = {error}
+                id={id}
+                type={isPassword && show ? "text" : type}
+                {...valueProps}
+                onChange={onChange}
+                placeholder={placeholder}
+                autoComplete={autoComplete}
+                error={Boolean(error)}
+                helperText={error}
                 fullWidth
-                size = "small"
-                slotProps = {{
+                size="small"
+                slotProps={{
 
                     input: isPassword
 
                         ? {
+                
+                                endAdornment: (
 
-                            endAdornment: (
+                                    <InputAdornment position="end">
 
-                                <InputAdornment position = "end">
+                                        <IconButton
 
-                                    <IconButton
+                                            edge="end"
+                                            onClick={() => setShow((prev) => !prev)}
+                                            aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}
 
-                                        edge = "end"
-                                        onClick = {() => setShow((prev) => !prev)}
-                                        aria-label = {show ? "Ocultar contraseña" : "Mostrar contraseña"}
+                                        >
 
-                                    >
+                                            {show ? <VisibilityOff /> : <Visibility />}
 
-                                        {show ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
 
-                                    </IconButton>
+                                    </InputAdornment>
 
+                                ),
 
-                                </InputAdornment>
+                            }
 
-                            ),
+                        : undefined,
 
-                        }
-
-                    : undefined,
+                    htmlInput: isPassword ? { autoCapitalize: "off", spellCheck: false } : undefined,
 
                 }}
 

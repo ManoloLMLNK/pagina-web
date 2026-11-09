@@ -1,0 +1,42 @@
+/*estilos propios de la pantalla "Crear Cuenta" la base tarjeta, titulo,
+formulario viene de Login.css aca solo va lo q cambia*/
+
+.login-screen__card:has(.register-form) {
+
+    min-height: 0;
+    padding: 48px 24px;
+
+}
+
+.login-screen__card:has(.register-form) .login-brand__title {
+  
+    margin-bottom: 40px;
+
+}
+
+.register-form .login-screen__register {
+
+    margin-top: 20px;
+
+}
+
+.multi-field__row {
+
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+
+}
+
+.multi-field__row + .multi-field__row {
+
+    margin-top: 8px;
+
+}
+
+.multi-field__ghost {
+
+    width: 40px;
+    flex-shrink: 0;
+
+}

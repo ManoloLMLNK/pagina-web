@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {useCart} from "../context/CartContext";
@@ -7,18 +7,33 @@ import Sidebar from "./Sidebar";
 import AccountMenu from "./organisms/AccountMenu/AccountMenu";
 import CartDrawer from "./organisms/CartDrawer/CartDrawer";
 import "./Home.css";
+import logo from "../assets/logo.png";
+import casaIcon from "../assets/icons/casa.png";
+import monitorIcon from "../assets/icons/monitor.png";
+import lupaIcon from "../assets/icons/lupa.png";
+import carritoIcon from "../assets/icons/carrito.png";
+import campanaIcon from "../assets/icons/campana.png";
+import CheckoutPanel from "./organisms/CheckoutPanel/CheckoutPanel";
 
 //esto es para reemplazar el backend ya q el profe dijo q aun no
 //conectemos la base de datos, a futuro habra q eliminar o editar estas constantes
 //sera para añadir productos por ahora esta forma
 
-const CATEGORIES = [
+const CATEGORIES = {
 
-    {id: "tecnologia", label: "tecnologia", icon: "PCPC"},
+    productos: [
 
-    {id: "hogar", label: "hogar", icon: "CASA"},
+        {id: "tecnologia", label: "tecnologia", icon: monitorIcon},
 
-];
+    ],
+
+    servicios: [
+
+        {id: "hogar", label: "hogar", icon: casaIcon},
+
+    ],
+
+};
 
 const EMPTY_CATEGORY_SLOTS = 9;
 
@@ -42,9 +57,17 @@ function ItemCard ({item}) {
 
     const {addItem} = useCart();
 
+    const navigate = useNavigate();
+
     return (
 
-        <div className = "card">
+        <div
+
+            className = "card"
+            onClick = {() => navigate(`/item/${item.id}`)}
+            style = {{cursor: "pointer"}}
+
+        >
 
             <div className = "card-image" />
             <p className = "card-name">{item.name}</p>
@@ -62,7 +85,13 @@ function ItemCard ({item}) {
 
                     className = "add-to-cart"
                     aria-label = "Agregar al carrito"
-                    onClick = {() => addItem(item)}
+                    onClick = {(e) => {
+
+                        e.stopPropagation();
+
+                        addItem(item);
+
+                    }}
                 
                 >
 
@@ -86,9 +115,41 @@ export default function Home() {
 
     const [activeTab, setActivateTab] = useState("productos");
     
-    const [cartAnchor, setCartAnchor] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const [CheckoutOpen, setCheckoutOpen] = useState(false);
+
+    const [searchText, setSearchText] = useState("");
 
     const navigate = useNavigate();
+
+    const handleSearch = () => {
+
+        const text = searchText.trim();
+
+        if (text) navigate(`/buscar?q=${encodeURIComponent(text)}`);
+
+    };
+
+    const handleCategory = (categoryId) => {
+
+        navigate(`/${activeTab}/${categoryId}`);
+
+    };
+
+    useEffect(() => {
+
+        document.title = "CompraYa - Inicio";
+
+    }, []);
+
+    const handleCloseAll = () => {
+
+        setAnchorEl(null);
+
+        setCheckoutOpen(false);
+
+    };
 
     return (
 
@@ -121,11 +182,14 @@ export default function Home() {
 
                 <div className = "brand">
 
-                    <div className = "brand-logo" aria-hidden = "true">
-
-                        carrito
-
-                    </div>
+                    <img 
+                    
+                        src = {logo}
+                        alt = "CompraYa"
+                        className = "brand-logo"
+                        style = {{width: 64, height: 64, borderRadius: "50%", objectFit: "cover"}}
+                        
+                    />
 
                     <span className = "brand-name">CompraYa</span>
 
@@ -135,7 +199,7 @@ export default function Home() {
 
                     <button className = "icon-button" aria-label = "Notificaciones">
 
-                        campanita
+                        <img src = {campanaIcon} alt = "" style = {{width: 26, height: 26}} />
 
                     </button>
 
@@ -147,9 +211,21 @@ export default function Home() {
 
             <div className = "search-bar">
 
-                <input type = "text" placeholder = "Buscar Servicio o Producto" />
+                <input
 
-                <button aria-label = "Buscar">Buscar</button>
+                    type = "text"
+                    placeholder = "Buscar Servicio o Producto"
+                    value = {searchText}
+                    onChange = {(e) => setSearchText(e.target.value)}
+                    onKeyDown = {(e) => e.key === "Enter" && handleSearch()}
+
+                />
+
+                <button aria-label = "Buscar" onClick = {handleSearch}>
+
+                    <img src = {lupaIcon} alt = "" style = {{width: 20, height: 20}} />
+
+                </button>
 
             </div>
 
@@ -187,11 +263,22 @@ export default function Home() {
 
                 <div className = "category-row">
 
-                    {CATEGORIES.map((cat) => (
+                    {CATEGORIES[activeTab].map((cat) => (
 
-                        <div className = "category-item" key = {cat.id}>
+                        <div
 
-                            <div className = "category-icon">{cat.icon}</div>
+                            className = "category-item"
+                            key = {cat.id}
+                            onClick = {() => handleCategory(cat.id)}
+                            style = {{cursor: "pointer"}}
+
+                        >
+
+                            <div className = "category-icon">
+
+                                <img src = {cat.icon} alt = "" style = {{width: 40, height: 40, objectFit: "contain"}} />
+
+                            </div>
 
                             <span>{cat.label}</span>
 
@@ -259,24 +346,33 @@ export default function Home() {
 
                 className = "cart-button"
                 aria-label = "Carrito"
-                onClick = {(e) => setCartAnchor(e.currentTarget)}
+                onClick = {(e) => {
+        
+                    setAnchorEl(e.currentTarget);
+
+                    setCheckoutOpen(false);
+    
+                }}
 
             >
 
-                carrito
+                <img src = {carritoIcon} alt = "" style = {{width: 28, height: 28}} />
 
             </button>
 
             <CartDrawer
 
-                anchorEl = {cartAnchor}
-                onClose = {() => setCartAnchor(null)}
-                onCheckout = {() => {
+                anchorEl = {CheckoutOpen ? null : anchorEl}
+                onClose = {handleCloseAll}
+                onCheckout = {() => setCheckoutOpen(true)}
 
-                    setCartAnchor(null);
-                    navigate("/pago");
+            />
+            
+            <CheckoutPanel
 
-                }}
+                anchorEl = {CheckoutOpen ? anchorEl : null}
+
+                onClose = {handleCloseAll}
 
             />
 

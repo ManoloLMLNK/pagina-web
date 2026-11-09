@@ -5,68 +5,240 @@ import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoginScreen from "./pages/Login/LoginScreen";
-import Register from "./components/Register";
+import RegisterScreen from "./pages/Register/RegisterScreen";
 import Home from "./components/Home";
-import CheckoutScreen from "./pages/Checkout/CheckoutScreen";
+import CatalogScreen from "./pages/Catalog/CatalogScreen";
+import ItemDetailScreen from "./pages/ItemDetail/ItemDetailScreen";
+import SearchScreen from "./Search/SearchScreen";
+import EmpresasScreen from "./pages/Empresas/EmpresasScreen";
+import ClientesScreen from "./pages/Clientes/ClientesScreen";
+import ProfileScreen from "./pages/Profile/ProfileScreen";
+import SettingsScreen from "./pages/Settings/SettingsScreen";
 
 function App() {
 
   return (
 
-    <ThemeProvider theme = {theme}>
-
+    <ThemeProvider theme={theme}>
+    
       <CssBaseline />
-
+    
       <AuthProvider>
-
+    
         <CartProvider>
-
+    
           <BrowserRouter>
-          
+    
             <Routes>
+    
+              <Route path="/" element={<LoginScreen />} />
+              <Route path="/registro" element={<RegisterScreen />} />
 
-              <Route path ="/" element = {<LoginScreen />} />
-              <Route path = "/registro" element = {<Register />} />
               <Route
-
-                path = "/home"
-                element = {
-
+    
+                path="/home"
+                element={
+                
                   <ProtectedRoute>
-
+                  
                     <Home />
-
+                  
                   </ProtectedRoute>
-
-                }
-
-              />
-
-              <Route
-
-                path = "/pago"
-                element = {
-
-                  <ProtectedRoute>
-
-                    <CheckoutScreen />
-
-                  </ProtectedRoute>
-
+                
                 }
               
               />
 
+              <Route
+
+                path="/perfil"
+                element={
+
+                  <ProtectedRoute>
+
+                    <ProfileScreen />
+
+                  </ProtectedRoute>
+
+                }
+
+              />
+
+              <Route
+
+                path="/configuracion"
+                element={
+
+                  <ProtectedRoute>
+
+                    <SettingsScreen />
+
+                  </ProtectedRoute>
+
+                }
+
+              />
+
+              <Route
+              
+                path="/productos"
+                element={
+                  
+                  <ProtectedRoute>
+                  
+                    <CatalogScreen tipo="productos" />
+                  
+                  </ProtectedRoute>
+                
+                }
+              
+              />
+              
+              <Route
+                
+                path="/productos/:categoria"
+                element={
+                
+                  <ProtectedRoute>
+                  
+                    <CatalogScreen tipo="productos" />
+                  
+                  </ProtectedRoute>
+                
+                }
+              
+              />
+              
+              <Route
+                
+                path="/productos/:categoria/:subcategoria"
+                element={
+                  
+                  <ProtectedRoute>
+                  
+                    <CatalogScreen tipo="productos" />
+                  
+                  </ProtectedRoute>
+                
+                }
+              
+              />
+
+              <Route
+                
+                path="/servicios"
+                element={
+                  
+                  <ProtectedRoute>
+                  
+                    <CatalogScreen tipo="servicios" />
+                  
+                  </ProtectedRoute>
+                
+                }
+              
+              />
+              
+              <Route
+                
+                path="/servicios/:categoria"
+                element={
+                  
+                  <ProtectedRoute>
+                  
+                    <CatalogScreen tipo="servicios" />
+                  
+                  </ProtectedRoute>
+                
+                }
+              
+              />
+              
+              <Route
+              
+                path="/servicios/:categoria/:subcategoria"
+                element={
+                  
+                  <ProtectedRoute>
+                  
+                    <CatalogScreen tipo="servicios" />
+                  
+                  </ProtectedRoute>
+                
+                }
+              
+              />
+
+              <Route
+                
+                path="/buscar"
+                element={
+                  
+                  <ProtectedRoute>
+                  
+                    <SearchScreen />
+                  
+                  </ProtectedRoute>
+                
+                }
+              
+              />
+
+              <Route
+                
+                path="/item/:id"
+                element={
+                  
+                  <ProtectedRoute>
+                  
+                    <ItemDetailScreen />
+                  
+                  </ProtectedRoute>
+                
+                }
+              
+              />
+
+              <Route
+                
+                path="/empresas"
+                element={
+                  
+                  <ProtectedRoute allowedRoles={["administrador"]}>
+                  
+                    <EmpresasScreen />
+                  
+                  </ProtectedRoute>
+                
+                }
+              
+              />
+              
+              <Route
+                
+                path="/clientes"
+                element={
+                  
+                  <ProtectedRoute allowedRoles={["administrador"]}>
+                  
+                    <ClientesScreen />
+                  
+                  </ProtectedRoute>
+                
+                }
+              
+              />
+            
             </Routes>
-
+          
           </BrowserRouter>
-
+        
         </CartProvider>
-
+      
       </AuthProvider>
-
+    
     </ThemeProvider>
-
+  
   );
 
 }

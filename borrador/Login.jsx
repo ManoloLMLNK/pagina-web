@@ -1,9 +1,9 @@
 import {useState} from "react";
 import "./Login.css";
 import { Link } from "react-router-dom";
-import { formatRut, isValidRut } from "../utils/rut";
+import { formatRut, isValidRut } from "../src/utils/rut";
 import { useNavigate } from "react-router-dom";
-import {useAuth } from "../context/AuthContext"
+import {useAuth } from "../src/context/AuthContext"
 
 //segun lo q lei de opiniones de otros programadores, es mejor
 //hacer los nombres de algunas cosas si esq no todas

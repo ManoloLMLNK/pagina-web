@@ -316,3 +316,12 @@ body {
     line-height: 1;
 
 }
+
+.login-brand__logo {
+
+    width: 96px;
+    height: 96px;
+    display: block;
+    margin: 0 auto 16px;
+
+}

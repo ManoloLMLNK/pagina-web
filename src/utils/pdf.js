@@ -35,8 +35,8 @@ export function generateOrderPDF(order) {
 
         doc.text (item.name, 14, y);
         doc.text(String(item.quantity), 128, y);
-        doc.text(formatCLP(item.price * item.quantity), 155);
-         y += 8;
+        doc.text(formatCLP(item.price * item.quantity), 155, y);
+            y += 8;
 
     });
 

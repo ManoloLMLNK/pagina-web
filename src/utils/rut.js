@@ -1,10 +1,30 @@
-export function formatRut(value) {
+//validacion de rut y todas esas cuestiones
 
-    const clean = value.replace(/[^0-9kK]/g, "").toUpperCase().slice(0, 9);
+export function formatRut(value) {
+  
+    const raw = value.replace(/[^0-9kK]/g, "").toUpperCase();
+  
+    let clean = "";
+  
+    for (const char of raw) {
+
+        if (clean.length >= 9 || clean.endsWith("K")) break;
+
+        if (char === "K") {
+
+            if (clean.length >= 7) clean += char;
+
+        } else {
+
+            clean += char;
+
+        }
+
+    }
 
     if (clean.length <= 1) return clean;
 
-    const body = clean.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+    const body = clean.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
     return `${body}-${clean.slice(-1)}`;
 
@@ -27,7 +47,6 @@ export function isValidRut(rut) {
     for (let i = body.length - 1; i >= 0; i--) {
 
         sum += Number(body[i]) * mult;
-
         mult = mult === 7 ? 2 : mult + 1;
 
     }
@@ -37,5 +56,31 @@ export function isValidRut(rut) {
     const expected = rest === 11 ? "0" : rest === 10 ? "K" : String(rest);
 
     return dv === expected;
+
+}
+
+export function isSuspiciousRut(rut) {
+
+    const clean = rut.replace(/[^0-9kK]/g, "").toUpperCase();
+
+    const body = clean.slice(0, -1);
+
+    if (body.length < 7) return true; //muy corto para ser un RUT real de una persona
+
+//y esta revisa q no sean iguales
+
+    if (/^(\d)\1+$/.test(body)) return true;
+
+//esta parte revisa q no sean rut tipo 123456789 o 987654321
+
+    const digits = body.split("").map(Number);
+
+    const isAscending = digits.every((d, i) => i === 0 || d === digits[i - 1] + 1);
+
+    const isDescending = digits.every((d, i) => i === 0 || d === digits[i - 1] - 1);
+
+    if (isAscending || isDescending) return true;
+
+    return false;
 
 }

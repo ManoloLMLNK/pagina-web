@@ -23,7 +23,7 @@ function formatCardNumber (value) {
 
 function formatExpiry (value) {
 
-    const digits = value.replace(/\D/g, "").slice(0, 6);
+    const digits = value.replace(/\D/g, "").slice(0, 4);
 
     if (digits.length <= 2) return digits;
 
@@ -62,7 +62,7 @@ export default function CardPaymentForm ({onBack, onSubmit, loading}) {
         const newErrors = {}
 
         if (!isValidCardNumber(cardNumber)) newErrors.cardNumber = "Número de tarjeta inválido";
-        if (!/^\d{2}\/\d{4}$/.test(expiry)) newErrors.expiry = "Formato Mes/Año";
+        if (!/^\d{2}\/\d{2}$/.test(expiry)) newErrors.expiry = "Formato Mes/Año";
         if (!/^\d{3,4}$/.test(cvv)) newErrors.cvv = "CVV inválido";
 
         setErrors(newErrors);
@@ -162,8 +162,9 @@ export default function CardPaymentForm ({onBack, onSubmit, loading}) {
                         size = "small"
                         placeholder = "3-4 Dígitos"
                         value = {cvv}
-                        onChange = {(e) => (e.target.value.replace(/\D/g, "").slice(0, 4))}
+                        onChange = {(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
                         error = {Boolean(errors.cvv)}
+                        helperText = {errors.cvv}
                         slotProps = {{htmlInput: {inputMode: "numeric"}}}
 
                     />

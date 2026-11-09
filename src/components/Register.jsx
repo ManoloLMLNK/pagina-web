@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatRut, isValidRut } from "../utils/rut";
 import "./Login.css"; //usa estos ajustes para no volver a hacerlo
 import "./Register.css"; //usa estos ajustes para no volver a hacerlo
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"
+import {sanitizeName, sanitizePhone} from "../utils/text";
+import logo from "../assets/logo.png";
+import LoginBrand from "./organisms/LoginBrand/LoginBrand";
 
 const FIELDS = [
 
@@ -91,13 +94,15 @@ export default function Register() {
 
             const { id, value } = e.target;
 
-            setForm((prev) => ({
+            let cleanValue = value;
 
-                ...prev,
+            if (id === "rut") cleanValue = formatRut(value);
 
-                [id]: id === "rut" ? formatRut(value) : value,
+            if (id === "fullName") cleanValue = sanitizeName(value);
 
-            }));
+            if (id === "phone") cleanValue = sanitizePhone(value);
+
+            setForm((prev) => ({...prev, [id]: cleanValue }));
 
         };
 
@@ -106,11 +111,19 @@ export default function Register() {
 
             e.preventDefault();
 
+            console.log("Datos del formulario de registro: ", form);
+
             const newErrors = validate(form);
 
             setErrors(newErrors);
 
-            if (Object.keys(newErrors).length > 0) return;
+            if (Object.keys(newErrors).length > 0) {
+
+                console.log("Errores de validación en registro: ", newErrors);
+
+                return;
+
+            }
 
             setLoading(true);
 
@@ -120,12 +133,16 @@ export default function Register() {
 
                 if (!result.ok) {
 
-                    setErrors({ rut: result.error });
+                    console.log("Registro fallido: ", result.error);
+
+                    setErrors({rut: result.error});
 
                     return;
 
                 }
 
+                console.log("Registro exitoso: ", result.user);
+                
                 navigate("/");
 
             } finally {
@@ -136,13 +153,19 @@ export default function Register() {
 
         };
 
+        useEffect(() => {
+
+            document.title = "CompraYa - Crear Cuenta";
+
+        }, []);
+
         return (
 
             <main className = "login-page">
 
                 <section className = "login-card register-card">
 
-                    <h1 className = "login-title">Crear Cuenta</h1>
+                    <LoginBrand title = "Crear Cuenta"/>
 
                     <form className = "login-form" onSubmit = {handleSubmit} noValidate>
 
