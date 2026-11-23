@@ -114,6 +114,21 @@ function App() {
 
               <Route
 
+                path="/mi-empresa"
+                element={
+
+                  <ProtectedRoute allowedRoles={["vendedor", "administrador"]}>
+
+                    <MyCompanyScreen />
+
+                  </ProtectedRoute>
+
+                }
+
+              />
+
+              <Route
+
                 path="/configuracion"
                 element={
 

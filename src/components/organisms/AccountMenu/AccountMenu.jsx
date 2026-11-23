@@ -69,7 +69,7 @@ const MENUS = {
   vendedor: [
   
     { label: "Mi Perfil", path: "/perfil", icon: <PersonOutlined fontSize="small" /> },
-    { label: "Mi Empresa", path: "/empresas", icon: <StorefrontOutlined fontSize="small" /> },  
+    { label: "Mi Empresa", path: "/mi-empresa", icon: <StorefrontOutlined fontSize="small" /> }, 
     { label: "Mis Productos", path: "/administrar/productos", icon: <Inventory2Outlined fontSize="small" /> },
     { label: "Mis Servicios", path: "/administrar/servicios", icon: <BuildOutlined fontSize="small" /> },
   
