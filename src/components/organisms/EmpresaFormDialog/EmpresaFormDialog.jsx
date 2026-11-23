@@ -17,6 +17,7 @@ const EMPTY_VALUES = {
     regionId: "",
     comuna: "",
     emprendedorNombre: "",
+    emprendedorRut: "",
     emprendedorDireccion: "",
     emprendedorCargo: "",
     emprendedorTelefono: "",
@@ -25,6 +26,33 @@ const EMPTY_VALUES = {
 };
 
 const REGION_OPTIONS = REGIONES.map((r) => ({ value: r.id, label: r.nombre }));
+
+//convierte una empresa guardada en los valores del formulario (para editarla)
+
+function toFormValues(empresa) {
+
+    if (!empresa) return EMPTY_VALUES;
+
+    return {
+
+        nombre: empresa.nombre ?? "",
+        rut: empresa.rut ?? "",
+        paginaWeb: empresa.paginaWeb ?? "",
+        telefono: empresa.telefono ?? "",
+        correo: empresa.correo ?? "",
+        direccion: empresa.direccion ?? "",
+        regionId: REGIONES.find((r) => r.nombre === empresa.region)?.id ?? "",
+        comuna: empresa.comuna ?? "",
+        emprendedorNombre: empresa.emprendedor?.nombre ?? "",
+        emprendedorRut: empresa.emprendedor?.rut ?? "",
+        emprendedorDireccion: empresa.emprendedor?.direccion ?? "",
+        emprendedorCargo: empresa.emprendedor?.cargo ?? "",
+        emprendedorTelefono: empresa.emprendedor?.telefono ?? "",
+        emprendedorCorreo: empresa.emprendedor?.correo ?? "",
+
+    };
+
+}
 
 const REQUIRED = "Campo obligatorio.";
 
@@ -72,6 +100,16 @@ function validate(values) {
 
     }
 
+    //el rut del emprendedor es opcional, pero si se escribe tiene q ser real
+
+    if (values.emprendedorRut) {
+
+        if (!isValidRut(values.emprendedorRut)) errors.emprendedorRut = "Ingrese un RUT válido.";
+
+        else if (isSuspiciousRut(values.emprendedorRut)) errors.emprendedorRut = "Ingrese un RUT real, no uno de ejemplo.";
+
+    }
+
     if (values.emprendedorTelefono && !isValidPhone(values.emprendedorTelefono)) {
 
         errors.emprendedorTelefono = "Ingrese un teléfono válido.";
@@ -88,25 +126,25 @@ function validate(values) {
 
 }
 
-export default function EmpresaFormDialog({ open, onClose, onSave }) {
+export default function EmpresaFormDialog({ open, onClose, onSave, empresa }) {
 
     const [values, setValues] = useState(EMPTY_VALUES);
 
     const [errors, setErrors] = useState({});
 
-    //cada vez que se abre, el formulario aparece vacio
+    //cada vez que se abre, el formulario aparece vacio (o con los datos de la empresa q se edita)
 
     useEffect(() => {
 
         if (open) {
 
-            setValues(EMPTY_VALUES);
+            setValues(toFormValues(empresa));
 
             setErrors({});
 
         }
 
-    }, [open]);
+    }, [open, empresa]);
 
     //devuelve una funcion distinta segun el campo, y limpia lo que no se puede escribir
 
@@ -114,7 +152,7 @@ export default function EmpresaFormDialog({ open, onClose, onSave }) {
 
         let value = e.target.value;
 
-        if (field === "rut") value = formatRut(value);
+        if (field === "rut" || field === "emprendedorRut") value = formatRut(value);
 
         if (field === "telefono" || field === "emprendedorTelefono") value = sanitizePhone(value);
 
@@ -165,6 +203,7 @@ export default function EmpresaFormDialog({ open, onClose, onSave }) {
             emprendedor: {
 
                 nombre: values.emprendedorNombre.trim(),
+                rut: values.emprendedorRut,
                 direccion: values.emprendedorDireccion.trim(),
                 cargo: values.emprendedorCargo.trim(),
                 telefono: values.emprendedorTelefono,
@@ -188,7 +227,15 @@ export default function EmpresaFormDialog({ open, onClose, onSave }) {
 
     return (
 
-        <FormDialog open={open} onClose={onClose} onSubmit={handleSubmit} submitLabel="Guardar Empresa">
+        <FormDialog
+
+            open={open}
+            onClose={onClose}
+            onSubmit={handleSubmit}
+            title={empresa ? "Editar Empresa" : "Información General"}
+            submitLabel={empresa ? "Guardar Cambios" : "Guardar Empresa"}
+
+        >
 
             <div className="form-grid">
 
@@ -294,6 +341,13 @@ export default function EmpresaFormDialog({ open, onClose, onSave }) {
 
             <div className="form-dialog__section">Información Emprendedor</div>
 
+            <p style={{ fontSize: "0.85rem", margin: "0 0 12px" }}>
+
+                Si el RUT coincide con el de una cuenta registrada, esa persona verá esta empresa y su cargo en
+                &quot;Mi Empresa&quot;.
+
+            </p>
+
             <div className="form-grid">
 
                 <FormField
@@ -310,11 +364,12 @@ export default function EmpresaFormDialog({ open, onClose, onSave }) {
 
                 <FormField
 
-                    id="empresa-emprendedor-direccion"
-                    label="Dirección"
-                    placeholder="Ej: Av. Laureles 567"
-                    value={values.emprendedorDireccion}
-                    onChange={handleChange("emprendedorDireccion")}
+                    id="empresa-emprendedor-rut"
+                    label="Rut"
+                    placeholder="Ej: 12.345.678-9"
+                    value={values.emprendedorRut}
+                    onChange={handleChange("emprendedorRut")}
+                    error={errors.emprendedorRut}
 
                 />
 
@@ -325,6 +380,16 @@ export default function EmpresaFormDialog({ open, onClose, onSave }) {
                     placeholder="Ej: Gerente Comercial"
                     value={values.emprendedorCargo}
                     onChange={handleChange("emprendedorCargo")}
+
+                />
+
+                <FormField
+
+                    id="empresa-emprendedor-direccion"
+                    label="Dirección"
+                    placeholder="Ej: Av. Laureles 567"
+                    value={values.emprendedorDireccion}
+                    onChange={handleChange("emprendedorDireccion")}
 
                 />
 

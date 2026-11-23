@@ -1,8 +1,21 @@
-export default function DataTable({ columns, rows, minRows = 10, emptyMessage = "No hay registros.", onDelete }) {
+export default function DataTable({
+
+  columns,
+  rows,
+  minRows = 10,
+  emptyMessage = "No hay registros.",
+  onEdit,
+  onDelete,
+  canEdit = () => true,
+  canDelete = () => true,
+
+}) {
 
   const fillerRows = Math.max(0, minRows - rows.length);
 
-  const totalColumns = columns.length + 1 + (onDelete ? 1 : 0);
+  const hasActions = Boolean(onEdit || onDelete);
+
+  const totalColumns = columns.length + 1 + (hasActions ? 1 : 0);
 
   return (
 
@@ -22,7 +35,7 @@ export default function DataTable({ columns, rows, minRows = 10, emptyMessage = 
 
             ))}
 
-            {onDelete && <th>Acciones</th>}
+            {hasActions && <th>Acciones</th>}
 
           </tr>
 
@@ -42,15 +55,31 @@ export default function DataTable({ columns, rows, minRows = 10, emptyMessage = 
 
               ))}
 
-              {onDelete && (
+              {hasActions && (
 
                 <td>
 
-                  <button type="button" aria-label="Eliminar" onClick={() => onDelete(row)}>
+                  {onEdit && canEdit(row) && (
 
-                    Eliminar
+                    <button type="button" aria-label="Editar" onClick={() => onEdit(row)}>
 
-                  </button>
+                      Editar
+
+                    </button>
+
+                  )}
+
+                  {onEdit && canEdit(row) && onDelete && canDelete(row) && " "}
+
+                  {onDelete && canDelete(row) && (
+
+                    <button type="button" aria-label="Eliminar" onClick={() => onDelete(row)}>
+
+                      Eliminar
+
+                    </button>
+
+                  )}
 
                 </td>
 

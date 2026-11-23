@@ -149,7 +149,7 @@ export function AuthProvider({children}) {
 
     const logout = () => setCurrentUser(null);
 
-    //selector/subir rango o degradar rangos a los usuarios
+    //selector / subir rango o degradar rangos a los usuarios
 
     const changeUserRole = (rut, role) => {
 
@@ -158,6 +158,36 @@ export function AuthProvider({children}) {
         setCurrentUser((prev) => (prev?.rut === rut ? {...prev, role} : prev));
 
     }
+
+    const removeUser = (rut) => {
+
+        if (rut === currentUser?.rut) {
+
+            return {ok: false, error: "No puedes eliminar tu propia cuenta."};
+
+        }
+
+        //la cuenta principal se vuelve a crear sola al cargar la pagina, asi q no se elimina
+
+        if (rut === SEED_ADMIN.rut) {
+
+            return {ok: false, error: "La cuenta del administrador principal no se puede eliminar."};
+
+        }
+
+        const target = users.find((u) => u.rut === rut);
+
+        if (target?.role === "administrador" && users.filter((u) => u.role === "administrador").length <= 1) {
+
+            return {ok: false, error: "No se puede eliminar al único administrador."};
+
+        }
+
+        setUsers((prev) => prev.filter((u) => u.rut !== rut));
+
+        return {ok: true};
+
+    };
 
     const updateProfile = (rut, { fullName, email, phones, addresses }) => {
 
@@ -193,7 +223,7 @@ export function AuthProvider({children}) {
 
         <AuthContext.Provider
                 
-            value={{users, currentUser, register, login, logout, changeUserRole, addAdmin, updateProfile}}
+            value={{users, currentUser, register, login, logout, changeUserRole, addAdmin, updateProfile, removeUser}}
 
             >
 

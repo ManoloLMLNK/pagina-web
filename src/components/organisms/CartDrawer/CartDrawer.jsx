@@ -6,10 +6,13 @@ import AddIcon from "@mui/icons-material/Add";
 import ShoppingBagOutlined from "@mui/icons-material/ShoppingBagOutlined";
 import { useCart } from "../../../context/CartContext";
 import { formatCLP } from "../../../utils/currency";
+import { useNavigate } from "react-router-dom";
 
 export default function CartDrawer({ anchorEl, onClose, onCheckout }) {
 
     const { items, removeItem, updateQuantity, subtotal, iva, envio, total } = useCart();
+
+    const navigate = useNavigate();
 
     const open = Boolean(anchorEl);
 
@@ -164,6 +167,25 @@ export default function CartDrawer({ anchorEl, onClose, onCheckout }) {
               </Typography>
         
             </Box>
+
+            <Button
+
+              variant = "text"
+              fullWidth
+              sx = {{ mb: 1, textTransform: "none" }}
+              onClick = {() => {
+
+                onClose();
+
+                navigate("/carrito");
+
+              }}
+
+            >
+
+              Ver carrito completo
+
+            </Button>
 
             <Button
         

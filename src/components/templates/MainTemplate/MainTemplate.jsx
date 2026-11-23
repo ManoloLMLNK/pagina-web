@@ -1,3 +1,6 @@
+//me gustaria revisar mas estos dos jsx ya q son los unicos q
+//tienen esta "condicion" y me pone nervioso
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";

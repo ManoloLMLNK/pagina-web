@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
-   import MainTemplate from "../../components/templates/MainTemplate/MainTemplate";
+import MainTemplate from "../../components/templates/MainTemplate/MainTemplate";
 import ListToolbar from "../../components/organisms/ListToolbar/ListToolbar";
 import DataTable from "../../components/organisms/DataTable/DataTable";
 import EmpresaFormDialog from "../../components/organisms/EmpresaFormDialog/EmpresaFormDialog";
+import ConfirmDialog from "../../components/ConfirmDialog/Confirmdialog";
 import { useStoredList } from "../../hooks/useStoredList";
 import { matchesSearch } from "../../utils/search";
 import "../../styles/Admin.css";
+import { useAuth } from "../../context/AuthContext";
+import { sameRut } from "../../utils/rutMatch";
 
 //las columnas de la tabla, para quitar, agregar o reordenar, se edita esta lista
 
 const COLUMNS = [
-  
+
     { key: "nombre", label: "Nombre" },
-  
+
     { key: "rut", label: "Rut" },
 
     { key: "telefono", label: "Teléfono" },
@@ -25,15 +28,69 @@ const COLUMNS = [
 
 ];
 
+const ROLE_LABELS = {
+
+    administrador: "Administrador",
+    vendedor: "Vendedor",
+    comprador: "Comprador",
+
+};
+
 //la lista de empresas (solo para administradores)
 
 export default function EmpresasScreen() {
 
-    const { items: empresas, addItem, removeItem } = useStoredList("compraya_empresas");
+    const { items: empresas, addItem, updateItem, removeItem } = useStoredList("compraya_empresas");
 
     const [search, setSearch] = useState("");
 
     const [dialogOpen, setDialogOpen] = useState(false);
+
+    //la empresa q se esta editando (null cuando se esta agregando una nueva)
+
+    const [editing, setEditing] = useState(null);
+
+    const [toDelete, setToDelete] = useState(null);
+
+    const { users } = useAuth();
+
+    const columns = [
+
+        ...COLUMNS,
+
+        {
+
+            key: "emprendedor",
+            label: "Emprendedor",
+            render: (row) => {
+
+                const person = row.emprendedor;
+
+                if (!person?.nombre) return "—";
+
+                return person.cargo ? `${person.nombre} (${person.cargo})` : person.nombre;
+
+            },
+
+        },
+
+        {
+
+            key: "cuenta",
+            label: "Cuenta vinculada",
+            render: (row) => {
+
+                if (!row.emprendedor?.rut) return "—";
+
+                const account = users.find((u) => sameRut(u.rut, row.emprendedor.rut));
+
+                return account ? `${account.fullName} (${ROLE_LABELS[account.role] ?? account.role})` : "Sin cuenta";
+
+            },
+
+        },
+
+    ];
 
     useEffect(() => {
 
@@ -43,73 +100,120 @@ export default function EmpresasScreen() {
 
     const visibleEmpresas = empresas.filter((e) => matchesSearch([e.nombre, e.paginaWeb], search));
 
+    const handleAdd = () => {
+
+        setEditing(null);
+
+        setDialogOpen(true);
+
+    };
+
+    const handleEdit = (empresa) => {
+
+        setEditing(empresa);
+
+        setDialogOpen(true);
+
+    };
+
+    const handleCloseDialog = () => {
+
+        setDialogOpen(false);
+
+        setEditing(null);
+
+    };
+
     const handleSave = (data) => {
 
-        if (empresas.some((e) => e.rut === data.rut)) {
+        //el rut no se puede repetir (si se edita, se ignora la propia empresa)
+
+        if (empresas.some((e) => e.rut === data.rut && e.id !== editing?.id)) {
 
             return { ok: false, error: "Ya existe una empresa con ese RUT." };
 
         }
 
-        const saved = addItem(data);
+        if (editing) {
 
-        console.log("Empresa guardada:", saved);
+            updateItem(editing.id, data);
+
+            console.log("Empresa actualizada:", editing.id);
+
+        } else {
+
+            const saved = addItem(data);
+
+            console.log("Empresa guardada:", saved);
+
+        }
 
         return { ok: true };
 
     };
 
-    const handleDelete = (empresa) => {
+    const handleDelete = (empresa) => setToDelete(empresa);
 
-        if (window.confirm(`¿Eliminar la empresa "${empresa.nombre}"?`)) {
+    const handleConfirmDelete = () => {
 
-            removeItem(empresa.id);
+        if (toDelete) removeItem(toDelete.id);
 
-        }
+        setToDelete(null);
 
     };
 
     return (
-    
+
         <MainTemplate
-            
+
             toolbar={
-        
+
                 <ListToolbar
-        
+
                     title="Empresas"
                     searchPlaceholder="Buscar por Nombre o Página Web"
                     searchValue={search}
-                    onSearchChange={setSearch}        
-                    onAdd={() => setDialogOpen(true)}
-        
+                    onSearchChange={setSearch}
+                    onAdd={handleAdd}
+
                 />
-      
+
             }
-    
+
         >
-    
+
             <DataTable
-    
-                columns={COLUMNS}
+
+                columns={columns}
                 rows={visibleEmpresas}
                 minRows={search ? 0 : 10}
                 emptyMessage="No se encontraron empresas."
+                onEdit={handleEdit}
                 onDelete={handleDelete}
-    
+
             />
 
-    
             <EmpresaFormDialog
-    
+
                 open={dialogOpen}
-                onClose={() => setDialogOpen(false)}
+                empresa={editing}
+                onClose={handleCloseDialog}
                 onSave={handleSave}
-    
+
             />
-    
+
+            <ConfirmDialog
+
+                open={Boolean(toDelete)}
+                title="Eliminar empresa"
+                message={toDelete ? `¿Seguro que quieres eliminar la empresa "${toDelete.nombre}"?` : ""}
+                onConfirm={handleConfirmDelete}
+                onClose={() => setToDelete(null)}
+
+            />
+
         </MainTemplate>
-  
+
     );
 
 }

@@ -53,12 +53,18 @@ export function useStoredList(storageKey) {
 
     };
 
+    const updateItem = (id, changes) => {
+
+        setItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...changes } : item)));
+
+    };
+
     const removeItem = (id) => {
 
         setItems((prev) => prev.filter((item) => item.id !== id));
 
     };
 
-    return { items, addItem, removeItem };
+    return { items, addItem, updateItem, removeItem };
 
 }

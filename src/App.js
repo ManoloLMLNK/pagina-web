@@ -14,6 +14,9 @@ import EmpresasScreen from "./pages/Empresas/EmpresasScreen";
 import ClientesScreen from "./pages/Clientes/ClientesScreen";
 import ProfileScreen from "./pages/Profile/ProfileScreen";
 import SettingsScreen from "./pages/Settings/SettingsScreen";
+import CartScreen from "./pages/Cart/CartScreen";
+import ManageItemsScreen from "./pages/Manage/ManageItemsScreen";
+import MyCompanyScreen from "./pages/MyCompany/MyCompanyScreen";
 
 function App() {
 
@@ -57,6 +60,51 @@ function App() {
                   <ProtectedRoute>
 
                     <ProfileScreen />
+
+                  </ProtectedRoute>
+
+                }
+
+              />
+
+              <Route
+
+                path="/carrito"
+                element={
+
+                <ProtectedRoute>
+
+                  <CartScreen />
+
+                </ProtectedRoute>
+
+                }
+
+              />
+
+              <Route
+
+                path="/administrar/productos"
+                element={
+
+                  <ProtectedRoute allowedRoles={["vendedor", "administrador"]}>
+
+                    <ManageItemsScreen key="productos" tipo="productos" />
+
+                  </ProtectedRoute>
+
+                }
+
+              />
+
+              <Route
+
+                path="/administrar/servicios"
+                element={
+
+                  <ProtectedRoute allowedRoles={["vendedor", "administrador"]}>
+
+                    <ManageItemsScreen key="servicios" tipo="servicios" />
 
                   </ProtectedRoute>
 

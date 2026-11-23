@@ -3,6 +3,8 @@ import MainTemplate from "../../components/templates/MainTemplate/MainTemplate";
 import ListToolbar from "../../components/organisms/ListToolbar/ListToolbar";
 import DataTable from "../../components/organisms/DataTable/DataTable";
 import ClienteFormDialog from "../../components/organisms/ClienteFormDialog/ClienteFormDialog";
+import UserEditDialog from "../../components/organisms/UserEditDialog/UserEditDialog";
+import ConfirmDialog from "../../components/ConfirmDialog/Confirmdialog";
 import { useStoredList } from "../../hooks/useStoredList";
 import { matchesSearch } from "../../utils/search";
 import "../../styles/Admin.css";
@@ -28,15 +30,44 @@ const ROLES = [
 
 ];
 
+//junta los datos de la fila con los de la cuenta (si tiene) para llenar el formulario de edicion
+//asi no se pierden los telefonos y direcciones extra de una cuenta
+
+function buildEditValues(row, users) {
+
+    const account = users.find((u) => u.rut === row.rut);
+
+    return {
+
+        id: row.id,
+        esCuenta: Boolean(row.esCuenta),
+        rut: row.rut,
+        nombre: account?.fullName ?? row.nombre ?? "",
+        correo: account?.email ?? row.correo ?? "",
+        phones: account?.phones ?? (account?.phone ? [account.phone] : row.telefono ? [row.telefono] : []),
+        addresses: account?.addresses ?? (row.direccion ? [row.direccion] : []),
+
+    };
+
+}
+
 //la lista de clientes (solo para administradores)
 
 export default function ClientesScreen() {
 
-    const { items: clientes, addItem, removeItem } = useStoredList("compraya_clientes");
+    const { items: clientes, addItem, updateItem, removeItem } = useStoredList("compraya_clientes");
 
     const [search, setSearch] = useState("");
 
     const [dialogOpen, setDialogOpen] = useState(false);
+
+    const [toDelete, setToDelete] = useState(null);
+
+    const [notice, setNotice] = useState("");
+
+    //la persona q se esta editando (con sus datos ya listos para el formulario)
+
+    const [editing, setEditing] = useState(null);
 
     useEffect(() => {
 
@@ -44,7 +75,7 @@ export default function ClientesScreen() {
 
     }, []);
 
-    const { users, currentUser, changeUserRole } = useAuth();
+    const { users, currentUser, changeUserRole, removeUser, updateProfile } = useAuth();
 
     //las cuentas registradas q no estan en la lista de clientes tambien se muestran
 
@@ -124,21 +155,73 @@ export default function ClientesScreen() {
 
     };
 
-    const handleDelete = (cliente) => {
+    const handleEdit = (row) => setEditing(buildEditValues(row, users));
 
-        if (cliente.esCuenta) {
+    const handleSaveEdit = (data) => {
 
-            window.alert("Esta fila es una cuenta registrada y no se puede eliminar desde aquí.");
+        //si la persona tiene cuenta, se actualiza la cuenta (vale para cualquier rol)
 
-            return;
+        if (users.some((u) => u.rut === editing.rut)) {
+
+            updateProfile(editing.rut, {
+
+                fullName: data.nombre,
+                email: data.correo,
+                phones: data.phones,
+                addresses: data.addresses,
+
+            });
 
         }
 
-        if (window.confirm(`¿Eliminar al cliente "${cliente.nombre}"?`)) {
+        //y si ademas esta en la lista de clientes, tambien se actualiza ahi
 
-            removeItem(cliente.id);
+        if (!editing.esCuenta) {
+
+            updateItem(editing.id, {
+
+                nombre: data.nombre,
+                correo: data.correo,
+                telefono: data.phones[0] ?? "",
+                direccion: data.addresses[0] ?? "",
+
+            });
 
         }
+
+        setEditing(null);
+
+    };
+
+    const handleDelete = (cliente) => setToDelete(cliente);
+
+    const handleConfirmDelete = () => {
+
+        if (!toDelete) return;
+
+        //si la persona tiene cuenta, tambien se elimina la cuenta
+
+        const hasAccount = users.some((u) => u.rut === toDelete.rut);
+
+        if (hasAccount) {
+
+            const result = removeUser(toDelete.rut);
+
+            if (!result.ok) {
+
+                setToDelete(null);
+
+                setNotice(result.error);
+
+                return;
+
+            }
+
+        }
+
+        if (!toDelete.esCuenta) removeItem(toDelete.id);
+
+        setToDelete(null);
 
     };
 
@@ -168,6 +251,7 @@ export default function ClientesScreen() {
                 rows={visibleClientes}
                 minRows={search ? 0 : 10}
                 emptyMessage="No se encontraron clientes."
+                onEdit={handleEdit}
                 onDelete={handleDelete}
 
             />
@@ -177,6 +261,44 @@ export default function ClientesScreen() {
                 open={dialogOpen}
                 onClose={() => setDialogOpen(false)}
                 onSave={handleSave}
+
+            />
+
+            <UserEditDialog
+
+                open={Boolean(editing)}
+                user={editing}
+                onClose={() => setEditing(null)}
+                onSave={handleSaveEdit}
+
+            />
+
+            <ConfirmDialog
+
+                open={Boolean(toDelete)}
+                title="Eliminar cliente"
+                message={
+
+                    toDelete
+
+                        ? `¿Seguro que quieres eliminar a "${toDelete.nombre}"?${users.some((u) => u.rut === toDelete.rut) ? " También se eliminará su cuenta." : ""}`
+
+                        : ""
+
+                }
+                onConfirm={handleConfirmDelete}
+                onClose={() => setToDelete(null)}
+
+            />
+
+            <ConfirmDialog
+
+                open={Boolean(notice)}
+                title="No se puede eliminar"
+                message={notice}
+                confirmLabel="Entendido"
+                onConfirm={() => setNotice("")}
+                onClose={() => setNotice("")}
 
             />
 

@@ -70,16 +70,16 @@ const MENUS = {
   
     { label: "Mi Perfil", path: "/perfil", icon: <PersonOutlined fontSize="small" /> },
     { label: "Mi Empresa", path: "/empresas", icon: <StorefrontOutlined fontSize="small" /> },  
-    { label: "Mis Productos", path: "/productos", icon: <Inventory2Outlined fontSize="small" /> },
-    { label: "Mis Servicios", path: "/servicios", icon: <BuildOutlined fontSize="small" /> },
+    { label: "Mis Productos", path: "/administrar/productos", icon: <Inventory2Outlined fontSize="small" /> },
+    { label: "Mis Servicios", path: "/administrar/servicios", icon: <BuildOutlined fontSize="small" /> },
   
   ],
   
   administrador: [
   
     { label: "Mi Perfil", path: "/perfil", icon: <PersonOutlined fontSize="small" /> },
-    { label: "Administrar Productos", path: "/productos", icon: <Inventory2Outlined fontSize="small" /> },
-    { label: "Administrar Servicios", path: "/servicios", icon: <BuildOutlined fontSize="small" /> },
+    { label: "Administrar Productos", path: "/administrar/productos", icon: <Inventory2Outlined fontSize="small" /> },
+    { label: "Administrar Servicios", path: "/administrar/servicios", icon: <BuildOutlined fontSize="small" /> },
   
   ],
 

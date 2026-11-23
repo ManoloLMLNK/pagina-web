@@ -7,6 +7,7 @@ import CustomButton from "../../atoms/Button/CustomButton";
 import QuantitySelector from "../../molecules/QuantitySelector/QuantitySelector";
 import { useAuth } from "../../../context/AuthContext";
 import { isInWishlist, toggleWishlist } from "../../../utils/wishlist";
+import ItemComments from "../ItemComments/ItemComments";
 
 export default function ItemDetailView({ item, typeLabel }) {
   
@@ -173,6 +174,8 @@ export default function ItemDetailView({ item, typeLabel }) {
                     </section>
       
                 )}
+
+                <ItemComments key = {item.id} itemId = {item.id} />
       
             </div>
     

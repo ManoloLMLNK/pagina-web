@@ -14,42 +14,17 @@ import lupaIcon from "../assets/icons/lupa.png";
 import carritoIcon from "../assets/icons/carrito.png";
 import campanaIcon from "../assets/icons/campana.png";
 import CheckoutPanel from "./organisms/CheckoutPanel/CheckoutPanel";
+import { CATEGORIES, getItems } from "../data/catalog";
 
 //esto es para reemplazar el backend ya q el profe dijo q aun no
 //conectemos la base de datos, a futuro habra q eliminar o editar estas constantes
 //sera para añadir productos por ahora esta forma
 
-const CATEGORIES = {
-
-    productos: [
-
-        {id: "tecnologia", label: "tecnologia", icon: monitorIcon},
-
-    ],
-
-    servicios: [
-
-        {id: "hogar", label: "hogar", icon: casaIcon},
-
-    ],
-
-};
-
 const EMPTY_CATEGORY_SLOTS = 9;
 
-const FEATURED_PRODUCTS = [
-
-    {id: "p1", name: "audifonos bluetooth", price: 24990, rating: 4.8, reviews: 120},
-
-];
+const FEATURED_LIMIT = 10;
 
 const EMPTY_PRODUCT_SLOTS = 6;
-
-const FEATURED_SERVICES = [
-
-    {id: "s1", name: "limpieza de casa", price: 56990, rating: 4.5, reviews: 34},
-
-];
 
 const EMPTY_SERVICE_SLOTS = 6;
 
@@ -69,7 +44,16 @@ function ItemCard ({item}) {
 
         >
 
-            <div className = "card-image" />
+            <div className = "card-image">
+
+                {item.images?.[0] && (
+
+                    <img src = {item.images[0]} alt = {item.name} style = {{width: "100%", height: "100%", objectFit: "cover"}} />
+
+                )}
+
+            </div>
+            
             <p className = "card-name">{item.name}</p>
             <p className = "card-rating">
 
@@ -150,6 +134,10 @@ export default function Home() {
         setCheckoutOpen(false);
 
     };
+
+    const featuredProducts = getItems({tipo: "productos"}).reverse().slice(0, FEATURED_LIMIT);
+
+    const featuredServices = getItems({tipo: "servicios"}).reverse().slice(0, FEATURED_LIMIT);
 
     return (
 
@@ -303,13 +291,13 @@ export default function Home() {
 
                 <div className = "card-row">
 
-                    {FEATURED_PRODUCTS.map((p) => (
+                    {featuredProducts.map((p) => ( //posible error
 
                         <ItemCard key = {p.id} item = {p} />
 
                     ))}
 
-                    {Array.from({length: EMPTY_CATEGORY_SLOTS}).map((_, i) => (
+                    {Array.from({length: Math.max(0, FEATURED_LIMIT - featuredProducts.length)}).map((_, i) => (
 
                         <div className="card placeholder" key={`prod-empty-${i}`} />
 
@@ -326,13 +314,13 @@ export default function Home() {
 
                 <div className = "card-row">
 
-                    {FEATURED_SERVICES.map((s) => (
+                    {featuredServices.map((s) => (
 
                         <ItemCard key = {s.id} item = {s} />
 
                     ))}
 
-                    {Array.from({length: EMPTY_CATEGORY_SLOTS}).map ((_, i) => (
+                    {Array.from({length: Math.max(0, FEATURED_LIMIT - featuredServices.length)}).map ((_, i) => (
 
                         <div className="card placeholder" key={`serv-empty-${i}`} />
 

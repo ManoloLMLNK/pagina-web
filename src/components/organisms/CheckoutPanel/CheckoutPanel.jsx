@@ -9,6 +9,7 @@ import CardPaymentForm from "../CardPaymentForm/CardPaymentForm";
 import PaymentSuccess from "../PaymentSuccess/PaymentSuccess";
 import { useAuth } from "../../../context/AuthContext";
 import { saveOrder } from "../../../utils/orders";
+import { decreaseStock } from "../../../data/catalog";
 
 const METHOD_LABELS = {
 
@@ -56,6 +57,8 @@ export default function CheckoutPanel ({anchorEl, onClose}) {
         if (currentUser) saveOrder(currentUser.rut, { ...newOrder, estado: "En preparación" });
 
         setOrder(newOrder);
+
+        decreaseStock(items);
 
         clearCart();
 

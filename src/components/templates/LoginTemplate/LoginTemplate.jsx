@@ -1,3 +1,5 @@
+//estas cosas nose porque se ven asi la verdad
+
 export default function LoginTemplate ({ brand, form }) {
 
     return (
