@@ -1,19 +1,21 @@
-//esta parte se puede borrar ya que ya se actualizo y mejoro esta parte
-//y ahora en lugar de mandarnos a otra "pagina" se superpone la parte de pago
+//pantalla de pago completa. El carrito usa CheckoutPanel, esta se conserva y hace lo mismo
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Box, Paper } from "@mui/material";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 import { generateOrderPDF } from "../../utils/pdf";
+import { saveOrder } from "../../utils/orders";
+import { decreaseStock } from "../../data/catalog";
 import PaymentMethodSelector from "../../components/organisms/PaymentMethodSelector/PaymentMethodSelector";
 import CardPaymentForm from "../../components/organisms/CardPaymentForm/CardPaymentForm";
-import "../../styles/Checkout.css";
 import PaymentSuccess from "../../components/organisms/PaymentSuccess/PaymentSuccess";
+import "../../styles/Checkout.css";
 
 const METHOD_LABELS = {
 
-    tarjeta: "Tarjeta de Crédito/Débito",
+    tarjeta: "Tarjeta de Crédito o Débito",
 
 };
 
@@ -21,18 +23,21 @@ export default function CheckoutScreen() {
 
     const navigate = useNavigate();
 
+    const { currentUser } = useAuth();
+
     const {items, subtotal, iva, envio, total, clearCart} = useCart();
 
     const [step, setStep] = useState("method");
+
     const [method, setMethod] = useState("");
+
     const [loading, setLoading] = useState(false);
+
     const [order, setOrder] = useState(null);
 
     if (items.length === 0 && step !== "success") {
 
-        navigate("/home");
-
-        return null;
+        return <Navigate to = "/home" replace />;
 
     }
 
@@ -42,6 +47,7 @@ export default function CheckoutScreen() {
 
             id: Math.floor(100000 + Math.random() * 900000),
             date: new Date().toLocaleString("es-CL"),
+            createdAt: new Date().toISOString(),
             items,
             subtotal,
             iva,
@@ -52,8 +58,15 @@ export default function CheckoutScreen() {
         };
 
         generateOrderPDF(newOrder);
+
+        if (currentUser) saveOrder(currentUser.rut, { ...newOrder, estado: "Recibido" });
+
+        decreaseStock(items);
+
         setOrder(newOrder);
+
         clearCart();
+
         setStep("success");
 
     };
@@ -75,9 +88,11 @@ export default function CheckoutScreen() {
     const handleCardSubmit = () => {
 
         setLoading(true);
+
         setTimeout(() => {
 
             setLoading(false);
+
             finishOrder();
 
         }, 800);
@@ -96,12 +111,18 @@ export default function CheckoutScreen() {
 
                 )}
 
+                {step === "card" && (
+
+                    <CardPaymentForm onBack = {() => setStep("method")} onSubmit = {handleCardSubmit} loading = {loading} />
+
+                )}
+
                 {step === "success" && order && (
 
                     <PaymentSuccess
 
                         order = {order}
-                        onViewOrders = {() => navigate ("/home")}
+                        onViewOrders = {() => navigate("/home")}
                         onBackHome = {() => navigate("/home")}
 
                     />

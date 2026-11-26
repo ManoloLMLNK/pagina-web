@@ -4,7 +4,7 @@ import DeleteOutlined from "@mui/icons-material/DeleteOutlined";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import ShoppingBagOutlined from "@mui/icons-material/ShoppingBagOutlined";
-import { useCart } from "../../../context/CartContext";
+import { lineKey, useCart } from "../../../context/CartContext";
 import { formatCLP } from "../../../utils/currency";
 import { useNavigate } from "react-router-dom";
 
@@ -54,7 +54,7 @@ export default function CartDrawer({ anchorEl, onClose, onCheckout }) {
 
             {items.map((item) => (
         
-              <Box key={item.id} sx={{ display: "flex", gap: 1.5, mb: 1.5 }}>
+              <Box key={lineKey(item)} sx={{ display: "flex", gap: 1.5, mb: 1.5 }}>
             
                 <Box
             
@@ -91,7 +91,7 @@ export default function CartDrawer({ anchorEl, onClose, onCheckout }) {
                     <IconButton
             
                       size = "small"
-                      onClick = {() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick = {() => updateQuantity(lineKey(item), item.quantity - 1)}
                       aria-label = "Restar"
                 
                     >
@@ -105,7 +105,7 @@ export default function CartDrawer({ anchorEl, onClose, onCheckout }) {
                     <IconButton
                 
                       size = "small"
-                      onClick = {() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick = {() => updateQuantity(lineKey(item), item.quantity + 1)}
                       aria-label = "Sumar"
                 
                     >
@@ -118,7 +118,7 @@ export default function CartDrawer({ anchorEl, onClose, onCheckout }) {
 
                 </Box>
 
-                <IconButton size = "small" onClick = {() => removeItem(item.id)} aria-label="Eliminar">
+                <IconButton size = "small" onClick = {() => removeItem(lineKey(item))} aria-label="Eliminar">
 
                   <DeleteOutlined fontSize = "small" />
 

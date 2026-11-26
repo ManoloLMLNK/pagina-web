@@ -4,107 +4,64 @@ import MainTemplate from "../../components/templates/MainTemplate/MainTemplate";
 import Breadcrumb from "../../components/molecules/Breadcrumb/Breadcrumb";
 import CategoryRow from "../../components/organisms/CategoryRow/CategoryRow";
 import ItemGrid from "../../components/organisms/ItemGrid/ItemGrid";
-import {
+import { TIPOS, findPath, getCategories, getItems } from "../../data/catalog";
 
-    TIPOS,
-    findCategory,
-    findSubcategory,
-    getCategories,
-    getItems,
-
-} from "../../data/catalog";
+//catalogo de productos o servicios cn cualquier nivel de categoria en la direccion
 
 export default function CatalogScreen({ tipo }) {
-
-    const { categoria, subcategoria } = useParams();
-
+    
+    const route = useParams()["*"] ?? "";
+    
+    const path = route.split("/").filter(Boolean);
+    
     const [search, setSearch] = useState("");
 
-    const tipoInfo = TIPOS[tipo];
-
-    const category = categoria ? findCategory(tipo, categoria) : undefined;
-
-    const subcategory = subcategoria ? findSubcategory(tipo, categoria, subcategoria) : undefined;
-
-    const isInvalidPath = Boolean(categoria && !category) || Boolean(subcategoria && !subcategory);
-
-    const currentLabel = subcategory?.label ?? category?.label ?? tipoInfo.label;
+    const trail = findPath(tipo, path);
+    
+    const { label } = TIPOS[tipo];
+    
+    const current = trail?.[trail.length - 1];
 
     useEffect(() => {
-
-        document.title = `CompraYa - ${currentLabel}`;
-
-    }, [currentLabel]);
-
-    useEffect(() => {
-
+    
         setSearch("");
+    
+    }, [tipo, route]);
 
-    }, [tipo, categoria, subcategoria]);
+    useEffect(() => {
+    
+        document.title = `CompraYa - ${current?.label ?? label}`;
+    
+    }, [current?.label, label]);
 
+    if (!trail) return <Navigate to={`/${tipo}`} replace />;
 
-    if (isInvalidPath) {
+    const urlOf = (depth) => `/${[tipo, ...path.slice(0, depth)].join("/")}`;
 
-        return <Navigate to={`/${tipo}`} replace />;
+    const segments = [
+    
+        { label, to: `/${tipo}` },
+    
+        ...trail.map((node, i) => ({ label: node.label, to: urlOf(i + 1) })),
+    
+    ];
 
-    }
-
-    const segments = [{ label: tipoInfo.label, to: `/${tipo}` }];
-
-    if (category) {
-
-        segments.push({ label: category.label, to: `/${tipo}/${category.id}` });
-
-    }
-
-    if (subcategory) {
-
-        segments.push({ label: subcategory.label, to: `/${tipo}/${category.id}/${subcategory.id}` });
-
-    }
-
-    let tiles = getCategories(tipo);
-
-    let tilesBaseUrl = `/${tipo}`;
-
-    if (category) {
-
-        tiles = category.subcategories;
-
-        tilesBaseUrl = `/${tipo}/${category.id}`;
-
-    }
-
-    const items = getItems({ tipo, categoria, subcategoria, search });
+    const tiles = current ? current.subcategories : getCategories(tipo);
+    
+    const items = getItems({ tipo, path, search });
 
     return (
-
-        <MainTemplate
-
-        searchPlaceholder={`Buscar ${tipoInfo.label}`}
-
-        searchValue={search}
-
-        onSearchChange={setSearch}
-
-        >
-
-      <Breadcrumb segments={segments} />
-
-      {!subcategoria && <CategoryRow categories={tiles} baseUrl={tilesBaseUrl} />}
-
-        <ItemGrid
-
-            items={items}
-
-            minSlots={search ? 0 : 14}
-
-            emptyMessage="No se encontraron resultados."
-
-        />
     
-    </MainTemplate>
-  
+        <MainTemplate searchPlaceholder={`Buscar ${label}`} searchValue={search} onSearchChange={setSearch}>
+        
+            <Breadcrumb segments={segments} />
+        
+            {tiles.length > 0 && <CategoryRow categories={tiles} baseUrl={urlOf(path.length)} />}
+        
+            <ItemGrid items={items} minSlots={search ? 0 : 14} emptyMessage="No se encontraron resultados." />
+        
+        </MainTemplate>
+    
     );
 
 }

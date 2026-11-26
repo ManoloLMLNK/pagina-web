@@ -4,10 +4,12 @@ import ArrowCircleRightOutlined from "@mui/icons-material/ArrowCircleRightOutlin
 import CustomButton from "../../atoms/Button/CustomButton";
 import LoginField from "../../molecules/LoginField/LoginField";
 import MultiTextField from "../../molecules/MultiTextField/MultiTextField";
+import AddressListField from "../../molecules/AddressListField/AddressListField";
 import { sanitizePhone } from "../../../utils/text";
 
-//el coso de "Crear Cuenta" solo se encarga de como se ve
+//el coso de Crear Cuenta solo se encarga de como se ve
 //los datos y la logica los recibe desde la pagina RegisterScreen
+
 export default function RegisterForm({
 
     values,
@@ -63,6 +65,18 @@ export default function RegisterForm({
 
             />
 
+            <LoginField
+
+                id="birthDate"
+                label="Fecha de nacimiento"
+                placeholder="Ej: 18/04/2005"
+                autoComplete="off"
+                value={values.birthDate}
+                onChange={onChange("birthDate")}
+                error={errors.birthDate}
+
+            />
+
             <MultiTextField
 
                 id="phone"
@@ -78,14 +92,9 @@ export default function RegisterForm({
 
             />
 
-            <MultiTextField
+            <AddressListField
 
-                id="address"
-                label="Dirección"
-                entryName="dirección"
-                placeholder="Ej: Av. Francia 12"
-                maxLength={120}
-                entries={addresses}
+                addresses={addresses}
                 onChange={onAddressesChange}
                 errors={errors.addresses}
 

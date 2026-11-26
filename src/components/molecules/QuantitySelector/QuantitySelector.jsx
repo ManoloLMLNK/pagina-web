@@ -12,7 +12,7 @@ export default function QuantitySelector({value, onChange, min = 1, max = 99}) {
 
                 display: "inline-flex",
 
-                alingItems: "center",
+                alignItems: "center",
 
                 gap: 1,
 

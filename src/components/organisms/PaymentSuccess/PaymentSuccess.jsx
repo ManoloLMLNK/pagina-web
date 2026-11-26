@@ -1,6 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import CheckCircleOutlined from "@mui/icons-material/CheckCircleOutlined";
 import { formatCLP } from "../../../utils/currency";
+import { paymentSummary } from "../../../utils/payment";
 
 export default function PaymentSuccess({ order, onViewOrders, onBackHome }) {
   
@@ -12,7 +13,7 @@ export default function PaymentSuccess({ order, onViewOrders, onBackHome }) {
 
       <Typography variant="h6" color="primary" fontWeight={700} sx={{ mb: 2 }}>
 
-        ¡Tu Pago Fue Exitoso!
+        ¡Tu Pedido Fue Registrado!
 
       </Typography>
 
@@ -25,6 +26,9 @@ export default function PaymentSuccess({ order, onViewOrders, onBackHome }) {
         </Typography>
         <Typography variant="body2">N° de Pedido: #{order.id}</Typography>
         <Typography variant="body2">Fecha: {order.date}</Typography>
+        {order.sellerName && <Typography variant="body2">Vendedor: {order.sellerName}</Typography>}
+        <Typography variant="body2">Medio de pago: {paymentSummary(order)}</Typography>
+        <Typography variant="body2">Estado: Recibido</Typography>
         <Typography variant="body2">Entrega: 3-5 Días Hábiles</Typography>
         <Typography variant="body2">Total Pagado: {formatCLP(order.total)}</Typography>
 

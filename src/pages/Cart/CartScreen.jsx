@@ -1,11 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import MainTemplate from "../../components/templates/MainTemplate/MainTemplate";
 import DataTable from "../../components/organisms/DataTable/DataTable";
 import CustomButton from "../../components/atoms/Button/CustomButton";
-import { useCart } from "../../context/CartContext";
+import { lineKey, useCart } from "../../context/CartContext";
 import { formatCLP } from "../../utils/currency";
 import { generateCartPDF } from "../../utils/pdf";
+import CheckoutPanel from "../../components/organisms/CheckoutPanel/CheckoutPanel";
 
 const boxStyle = {
 
@@ -22,13 +23,19 @@ const boxStyle = {
 
 export default function CartScreen() {
 
-    const { items, removeItem, updateQuantity, subtotal, iva, envio, total } = useCart();
+    const [payAnchor, setPayAnchor] = useState(null);
+
+    const { items, removeItem, updateQuantity, getMaxQuantity, subtotal, iva, envio, total } = useCart();
 
     useEffect(() => {
 
         document.title = "CompraYa - Mi Carrito";
 
     }, []);
+
+    //cada fila usa la llave de su linea asi dos variantes del mismo producto no se mezclan
+
+    const rows = items.map((item) => ({ ...item, id: lineKey(item), line: item }));
 
     const columns = [
 
@@ -48,7 +55,17 @@ export default function CartScreen() {
 
                     {" "}{row.quantity}{" "}
 
-                    <button type="button" onClick={() => updateQuantity(row.id, row.quantity + 1)}>+</button>
+                    <button
+
+                        type="button"
+                        disabled={row.quantity >= getMaxQuantity(row.line)}
+                        onClick={() => updateQuantity(row.id, row.quantity + 1)}
+
+                    >
+
+                        +
+
+                    </button>
 
                 </span>
 
@@ -77,7 +94,7 @@ export default function CartScreen() {
             <DataTable
 
                 columns={columns}
-                rows={items}
+                rows={rows}
                 minRows={0}
                 emptyMessage="Tu carrito está vacío."
                 onDelete={(row) => removeItem(row.id)}
@@ -91,11 +108,28 @@ export default function CartScreen() {
                 <p>Envío: {envio === 0 ? "Gratis" : formatCLP(envio)}</p>
                 <p><strong>Total: {formatCLP(total)}</strong></p>
 
-                <CustomButton onClick={handleDownload}>Descargar PDF</CustomButton>
+                <div className="cart-actions">
+
+                    <CustomButton
+
+                        disabled={items.length === 0}
+                        onClick={(e) => setPayAnchor(e.currentTarget)}
+
+                    >
+
+                        Ir a Pagar
+
+                    </CustomButton>
+
+                    <CustomButton onClick={handleDownload}>Descargar PDF</CustomButton>
+
+                </div>
 
                 <p><Link to="/home">Seguir comprando</Link></p>
 
             </div>
+
+            <CheckoutPanel anchorEl={payAnchor} onClose={() => setPayAnchor(null)} />
 
         </MainTemplate>
 

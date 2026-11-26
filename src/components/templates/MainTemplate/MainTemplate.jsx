@@ -2,7 +2,7 @@
 //tienen esta "condicion" y me pone nervioso
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import Sidebar from "../../Sidebar";
 import AccountMenu from "../../organisms/AccountMenu/AccountMenu";
@@ -90,7 +90,7 @@ export default function MainTemplate({
 
                 </button>
 
-                <div className="brand">
+                <Link to="/home" className="brand" style={{ textDecoration: "none", color: "inherit" }}>
 
                     <img
 
@@ -106,7 +106,7 @@ export default function MainTemplate({
 
                     <span className="brand-name">CompraYa</span>
 
-                </div>
+                </Link>
 
                 <div className="account">
 

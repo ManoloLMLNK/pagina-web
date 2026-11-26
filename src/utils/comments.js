@@ -1,7 +1,7 @@
 const key = (itemId) => `compraya_comentarios_${itemId}`;
 
 //comentarios de ejemplo para q cada publicacion parta con 5
-//para los productos nuevos q no esten aqui, la lista parte vacia
+//para los productos nuevos q no esten aqui la lista parte vacia
 
 const SEED_COMMENTS = {
 
@@ -33,7 +33,7 @@ function sortNewestFirst(list) {
 
 }
 
-//si todavia no hay nada guardado para la publicacion, se usan los de ejemplo
+//si todavia no hay nada guardado para la publicacion se usan los de ejemplo
 
 export function getComments(itemId) {
 
@@ -88,5 +88,21 @@ export function addComment(itemId, { author, rut, text }) {
 export function removeComment(itemId, commentId) {
 
     return save(itemId, getComments(itemId).filter((c) => c.id !== commentId));
+
+}
+
+export function updateComment(itemId, commentId, rut, text) {
+
+    const list = getComments(itemId).map((c) =>
+
+        c.id === commentId && c.rut && c.rut === rut
+
+            ? { ...c, text, edited: true, editedAt: new Date().toISOString() }
+
+            : c
+
+    );
+
+    return save(itemId, list);
 
 }

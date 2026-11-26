@@ -16,6 +16,7 @@ const EMPTY_VALUES = {
     direccion: "",
     regionId: "",
     comuna: "",
+    tipoBien: "",
     emprendedorNombre: "",
     emprendedorRut: "",
     emprendedorDireccion: "",
@@ -27,7 +28,7 @@ const EMPTY_VALUES = {
 
 const REGION_OPTIONS = REGIONES.map((r) => ({ value: r.id, label: r.nombre }));
 
-//convierte una empresa guardada en los valores del formulario (para editarla)
+//convierte una empresa guardada en los valores del formulario
 
 function toFormValues(empresa) {
 
@@ -43,6 +44,7 @@ function toFormValues(empresa) {
         direccion: empresa.direccion ?? "",
         regionId: REGIONES.find((r) => r.nombre === empresa.region)?.id ?? "",
         comuna: empresa.comuna ?? "",
+        tipoBien: empresa.tipoBien ?? "",
         emprendedorNombre: empresa.emprendedor?.nombre ?? "",
         emprendedorRut: empresa.emprendedor?.rut ?? "",
         emprendedorDireccion: empresa.emprendedor?.direccion ?? "",
@@ -55,6 +57,10 @@ function toFormValues(empresa) {
 }
 
 const REQUIRED = "Campo obligatorio.";
+
+//q ofrece el emprendedor
+
+const TIPO_BIEN_OPTIONS = ["Productos", "Servicios", "Productos y servicios"].map((t) => ({ value: t, label: t }));
 
 // Devuelve un mensaje por cada campo q este mal
 
@@ -90,6 +96,8 @@ function validate(values) {
 
     if (!values.comuna) errors.comuna = REQUIRED;
 
+    if (!values.tipoBien) errors.tipoBien = REQUIRED;
+
     if (!values.emprendedorNombre.trim()) {
 
         errors.emprendedorNombre = REQUIRED;
@@ -100,7 +108,7 @@ function validate(values) {
 
     }
 
-    //el rut del emprendedor es opcional, pero si se escribe tiene q ser real
+    //el rut del emprendedor es opcional pero si se escribe tiene q ser real
 
     if (values.emprendedorRut) {
 
@@ -132,7 +140,7 @@ export default function EmpresaFormDialog({ open, onClose, onSave, empresa }) {
 
     const [errors, setErrors] = useState({});
 
-    //cada vez que se abre, el formulario aparece vacio (o con los datos de la empresa q se edita)
+    //cada vez que se abre el formulario aparece vacio
 
     useEffect(() => {
 
@@ -146,7 +154,7 @@ export default function EmpresaFormDialog({ open, onClose, onSave, empresa }) {
 
     }, [open, empresa]);
 
-    //devuelve una funcion distinta segun el campo, y limpia lo que no se puede escribir
+    //devuelve una funcion distinta segun el campo y limpia lo q no se puede escribir
 
     const handleChange = (field) => (e) => {
 
@@ -164,7 +172,7 @@ export default function EmpresaFormDialog({ open, onClose, onSave, empresa }) {
 
     };
 
-    //al cambiar de region, la comuna elegida ya no sirve y se borra
+    //al cambiar de region la comuna elegida ya no sirve y se borra
 
     const handleRegionChange = (e) => {
 
@@ -200,6 +208,7 @@ export default function EmpresaFormDialog({ open, onClose, onSave, empresa }) {
             direccion: values.direccion.trim(),
             region: getRegion(values.regionId).nombre,
             comuna: values.comuna,
+            tipoBien: values.tipoBien,
             emprendedor: {
 
                 nombre: values.emprendedorNombre.trim(),
@@ -215,7 +224,7 @@ export default function EmpresaFormDialog({ open, onClose, onSave, empresa }) {
 
         if (!result.ok) {
 
-            setErrors({ rut: result.error });
+            setErrors({ [result.field ?? "rut"]: result.error });
 
             return;
 
@@ -334,6 +343,19 @@ export default function EmpresaFormDialog({ open, onClose, onSave, empresa }) {
                     value={values.comuna}
                     onChange={handleChange("comuna")}
                     error={errors.comuna}
+
+                />
+
+                <FormField
+
+                    id="empresa-tipo-bien"
+                    label="Tipo de bien que ofrece"
+                    required
+                    placeholder="Selecciona una opción"
+                    options={TIPO_BIEN_OPTIONS}
+                    value={values.tipoBien}
+                    onChange={handleChange("tipoBien")}
+                    error={errors.tipoBien}
 
                 />
 

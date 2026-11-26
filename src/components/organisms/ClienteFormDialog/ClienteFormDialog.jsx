@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import FormDialog from "../FormDialog/FormDialog";
 import FormField from "../../molecules/FormField/FormField";
 import { REGIONES, getComunas, getRegion } from "../../../data/chile";
+import { birthDateError } from "../../../utils/age";
 import { formatRut, isSuspiciousRut, isValidRut } from "../../../utils/rut";
 import { sanitizeName, sanitizePhone } from "../../../utils/text";
 import {
-    
+
     formatDateInput,
-    isValidBirthDate,
     isValidEmail,
     isValidPhone,
 
@@ -30,7 +30,7 @@ const REGION_OPTIONS = REGIONES.map((r) => ({ value: r.id, label: r.nombre }));
 
 const REQUIRED = "Campo obligatorio.";
 
-//devuelve un objeto con un mensaje por cada campo q este mal
+//devuelve un objeto cn un mensaje por cada campo q este mal
 
 function validate(values) {
 
@@ -46,13 +46,11 @@ function validate(values) {
 
     else if (isSuspiciousRut(values.rut)) errors.rut = "Ingrese un RUT real, no uno de ejemplo.";
 
-    if (!values.fechaNacimiento) errors.fechaNacimiento = REQUIRED;
+    //solo mayores de 18 igual q en el registro
 
-    else if (!isValidBirthDate(values.fechaNacimiento)) {
+    const birthError = birthDateError(values.fechaNacimiento);
 
-        errors.fechaNacimiento = "Ingrese una fecha válida (DD/MM/AAAA).";
-
-    }
+    if (birthError) errors.fechaNacimiento = birthError;
 
     if (!values.telefono) errors.telefono = REQUIRED;
 
@@ -68,11 +66,17 @@ function validate(values) {
 
     if (!values.comuna) errors.comuna = REQUIRED;
 
+    //el cliente debe tener al menos una direccion de despacho
+
+    if (!values.direccion.trim()) errors.direccion = REQUIRED;
+
+    else if (values.direccion.trim().length < 5) errors.direccion = "Ingrese calle y número.";
+
     return errors;
 
 }
 
-//el formulario "Información General" de un cliente
+//el formulario Información General de un cliente
 
 export default function ClienteFormDialog({ open, onClose, onSave }) {
 
@@ -80,7 +84,7 @@ export default function ClienteFormDialog({ open, onClose, onSave }) {
 
     const [errors, setErrors] = useState({});
 
-//cada vez q se abre, el formulario parte vacio
+//cada vez q se abre el formulario parte vacio
 
     useEffect(() => {
 
@@ -94,7 +98,7 @@ export default function ClienteFormDialog({ open, onClose, onSave }) {
 
     }, [open]);
 
-    //devuelve una funcion distinta segun el campo, y limpia lo que no se puede escribir.
+    //devuelve una funcion distinta segun el campo y limpia lo que no se puede escribir
 
     const handleChange = (field) => (e) => {
 
@@ -107,14 +111,14 @@ export default function ClienteFormDialog({ open, onClose, onSave }) {
         if (field === "telefono") value = sanitizePhone(value);
 
         if (field === "fechaNacimiento") value = formatDateInput(value);
-        
+
         setValues((prev) => ({ ...prev, [field]: value }));
 
         setErrors((prev) => ({ ...prev, [field]: undefined }));
 
     };
 
-    //al cambiar de region, la comuna elegida ya no sirve y se borra
+    //al cambiar de region la comuna elegida ya no sirve y se borra
 
     const handleRegionChange = (e) => {
 
@@ -155,7 +159,7 @@ export default function ClienteFormDialog({ open, onClose, onSave }) {
 
         if (!result.ok) {
 
-            setErrors({ rut: result.error });
+            setErrors({ [result.field ?? "rut"]: result.error });
 
             return;
 
@@ -273,9 +277,11 @@ export default function ClienteFormDialog({ open, onClose, onSave }) {
 
                     id="cliente-direccion"
                     label="Dirección de Despacho"
+                    required
                     placeholder="Ej: Av. Francia 12"
                     value={values.direccion}
                     onChange={handleChange("direccion")}
+                    error={errors.direccion}
 
                 />
 

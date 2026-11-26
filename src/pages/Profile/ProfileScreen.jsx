@@ -3,9 +3,15 @@ import { Link } from "react-router-dom";
 import MainTemplate from "../../components/templates/MainTemplate/MainTemplate";
 import { useAuth } from "../../context/AuthContext";
 import { getItemById } from "../../data/catalog";
+import { getAge } from "../../utils/age";
 import { formatCLP } from "../../utils/currency";
-import { getOrders } from "../../utils/orders";
+import { CANCELLED, TRANSACTION_STATES, getOrders, orderSellerRut, transactionStatus } from "../../utils/orders";
+import OrderActions from "../../components/molecules/OrderActions/OrderActions";
+import { generateHistoryPDF } from "../../utils/pdf";
 import { getWishlist, removeFromWishlist } from "../../utils/wishlist";
+import OrderStatusTracker from "../../components/molecules/OrderStatusTracker/OrderStatusTracker";
+import { paymentSummary } from "../../utils/payment";
+import { addressLabel } from "../../utils/shipping";
 
 const ROLE_LABELS = {
 
@@ -32,7 +38,9 @@ export default function ProfileScreen() {
 
     const { currentUser } = useAuth();
 
-    const [orders] = useState(() => getOrders(currentUser?.rut));
+    const [orders, setOrders] = useState(() => getOrders(currentUser?.rut));
+
+    const [filter, setFilter] = useState("Todas");
 
     const [wishlist, setWishlist] = useState(() => getWishlist(currentUser?.rut));
 
@@ -50,7 +58,11 @@ export default function ProfileScreen() {
 
     const addresses = currentUser.addresses ?? [];
 
+    const roles = (currentUser.roles ?? [currentUser.role]).map((r) => ROLE_LABELS[r] ?? r);
+
     const wishItems = wishlist.map((id) => getItemById(id)).filter(Boolean);
+
+    const shownOrders = orders.filter((o) => filter === "Todas" || transactionStatus(o) === filter);
 
     const handleRemoveWish = (id) => setWishlist(removeFromWishlist(currentUser.rut, id));
 
@@ -67,7 +79,20 @@ export default function ProfileScreen() {
                 <p><strong>Nombre:</strong> {currentUser.fullName}</p>
                 <p><strong>RUT:</strong> {currentUser.rut}</p>
                 <p><strong>Correo:</strong> {currentUser.email}</p>
-                <p><strong>Rol:</strong> {ROLE_LABELS[currentUser.role] ?? currentUser.role}</p>
+
+                <p>
+
+                    <strong>Edad:</strong>{" "}
+
+                    {currentUser.birthDate
+
+                        ? `${getAge(currentUser.birthDate)} años (${currentUser.birthDate})`
+
+                        : "—"}
+
+                </p>
+
+                <p><strong>{roles.length > 1 ? "Roles" : "Rol"}:</strong> {roles.join(" y ")}</p>
 
                 <p><strong>Teléfonos:</strong></p>
 
@@ -85,7 +110,7 @@ export default function ProfileScreen() {
 
                 {addresses.length > 0 ? (
 
-                    <ul>{addresses.map((a) => <li key={a}>{a}</li>)}</ul>
+                    <ul>{addresses.map((a, i) => <li key={i}>{addressLabel(a)}</li>)}</ul>
 
                 ) : (
 
@@ -123,18 +148,74 @@ export default function ProfileScreen() {
 
                 {orders.length === 0 && <p>Aún no has realizado compras.</p>}
 
-                {orders.map((order) => (
+                {orders.length > 0 && (
+
+                    <p style={{display: "flex", gap: 8, flexWrap: "wrap"}}>
+
+                        <select aria-label="Filtrar compras" value={filter} onChange={(e) => setFilter(e.target.value)}>
+                        
+                            {["Todas", ...TRANSACTION_STATES].map((s) => <option key={s} value={s}>{s}</option>)}
+                        
+                        </select>
+
+                        <button type="button" onClick={() => generateHistoryPDF(orders, "Historial de compras", () => currentUser.fullName)}>
+                        
+                            Descargar historial (PDF)
+                        
+                        </button>
+
+                    </p>
+
+                )}
+
+                {shownOrders.map((order) => (
 
                     <div key={order.id} style={{borderTop: "1px solid #eee", paddingTop: 8, marginTop: 8}}>
 
                         <p><strong>Pedido #{order.id}</strong> — {order.date}</p>
-                        <p><strong>Estado:</strong> {order.estado}</p>
+                        
+                        {order.sellerName && <p><strong>Vendedor:</strong> {order.sellerName}</p>}
+                        
+                        <p><strong>Medio de pago:</strong> {paymentSummary(order)}</p>
+                        
+                        <p><strong>Transacción:</strong> {transactionStatus(order)}</p>
+
+                        {order.estado !== CANCELLED && <OrderStatusTracker estado={order.estado} />}
+
+                        <OrderActions
+                            order={order}
+                            buyerRut={currentUser.rut}
+                            isBuyer
+                            onChange={() => setOrders(getOrders(currentUser.rut))}
+                        />
+
+                        {order.requiereDespacho !== undefined && (
+
+                            <p><strong>Despacho:</strong> {order.requiereDespacho ? order.direccionDespacho : "Sin despacho"}</p>
+
+                        )}
+
+                        {order.seguimiento && (
+
+                            <p><strong>Transporte:</strong> {order.transportista} — <strong>N° de seguimiento:</strong> {order.seguimiento}</p>
+
+                        )}
+
+                        {orderSellerRut(order) && orderSellerRut(order) !== currentUser.rut && (
+
+                            <p>
+
+                                <Link to={`/mensajes?con=${orderSellerRut(order)}&asunto=${encodeURIComponent(`Sobre el pedido #${order.id}: `)}`}>Escribir al vendedor</Link>
+
+                            </p>
+
+                        )}
 
                         <ul>
 
                             {order.items.map((it) => (
 
-                                <li key={it.id}>{it.name} x {it.quantity}</li>
+                                <li key={`${it.id}-${it.variantId ?? ""}`}>{it.name} x {it.quantity}</li>
 
                             ))}
 

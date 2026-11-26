@@ -1,0 +1,273 @@
+/*pantalla de administrar categorias*/
+
+.cat-tabs {
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0;
+
+}
+
+.cat-tabs .cat-btn--lg {
+
+    order: 2;
+    margin-left: auto;
+
+}
+
+.cat-btn--lg {
+
+    height: 36px;
+    padding: 0 18px;
+    font-size: 0.88rem;
+
+}
+
+.cat-list {
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+    align-items: start;
+    gap: 16px;
+
+}
+
+.cat-card {
+
+    border: 1px solid #d9d9e0;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+
+}
+
+.cat-card__head {
+
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 16px;
+    background: #f4f3fb;
+
+}
+
+.cat-card__title {
+
+    margin: 0;
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-weight: 500;
+    font-size: 1.15rem;
+    color: #5f4b8b;
+
+}
+
+.cat-icon {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #ececf6;
+    color: #5f4b8b;
+    font-size: 0.6rem;
+    font-weight: 600;
+
+}
+
+.cat-icon img {
+
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+
+}
+
+.cat-badge {
+
+    margin-left: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #fdf6d8;
+    color: #6b5a1e;
+    font-size: 0.72rem;
+    font-weight: 500;
+
+}
+
+.cat-actions {
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+
+}
+
+.cat-btn {
+
+    height: 30px;
+    padding: 0 12px;
+    border: 1px solid #d9d9e0;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #333333;
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+}
+
+.cat-btn:hover {
+
+    background: #faf9fe;
+
+}
+
+.cat-btn:focus-visible {
+
+    outline: 2px solid #5f4b8b;
+    outline-offset: 2px;
+
+}
+
+.cat-btn--primary {
+
+    border-color: #5f4b8b;
+    background: #5f4b8b;
+    color: #ffffff;
+
+}
+
+.cat-btn--primary:hover {
+
+    background: #4e3d75;
+
+}
+
+.cat-btn--danger {
+
+    border-color: #f0c9c9;
+    color: #d32f2f;
+
+}
+
+.cat-btn--danger:hover {
+
+    background: #fdf1f1;
+
+}
+
+.cat-sublist {
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+}
+
+.cat-subitem {
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 16px 8px 62px;
+    border-top: 1px solid #ececf0;
+    font-size: 0.9rem;
+
+}
+
+.cat-subitem:hover {
+
+    background: #faf9fe;
+
+}
+
+.cat-empty {
+
+    margin: 0;
+    padding: 10px 16px 12px 62px;
+    color: #7a7a80;
+    font-size: 0.85rem;
+
+}
+
+@media (max-width: 700px) {
+
+    .cat-actions {
+
+        margin-left: 0;
+        width: 100%;
+
+    }
+
+    .cat-subitem {
+
+        flex-wrap: wrap;
+        padding-left: 16px;
+
+    }
+
+    .cat-empty {
+
+        padding-left: 16px;
+
+    }
+
+}
+
+.cat-toggle {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-right: 4px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #5f4b8b;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+}
+
+.cat-toggle--empty {
+
+    cursor: default;
+
+}
+
+.cat-toggle:focus-visible {
+
+    outline: 2px solid #5f4b8b;
+    outline-offset: 2px;
+
+}
+
+.cat-count {
+
+    margin-left: 6px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: #ececf6;
+    color: #5f4b8b;
+    font-size: 0.72rem;
+
+}
+
+.cat-subitem__name {
+
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2px;
+
+}

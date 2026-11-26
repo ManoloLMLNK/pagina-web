@@ -270,3 +270,22 @@
     }
 
 }
+
+.cart-actions {
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+
+}
+
+.cart-actions button {
+
+    width: auto;
+    min-width: 0;
+    min-height: 0;
+    padding: 6px 16px;
+    font-size: 13px;
+
+}

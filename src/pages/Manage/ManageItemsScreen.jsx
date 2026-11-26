@@ -9,8 +9,7 @@ import {
 
     TIPOS,
     addPublication,
-    findCategory,
-    findSubcategory,
+    categoryLabel,
     getPublications,
     removePublication,
     updatePublication,
@@ -22,9 +21,9 @@ import "../../styles/Admin.css";
 
 const STORAGE_ERROR = "No hay espacio para guardar. Prueba con menos fotos o con fotos más livianas.";
 
-//con 5 unidades o menos se avisa q queda poco
+//cn menos de 10 unidades se avisa q queda poco
 
-const LOW_STOCK = 5;
+const LOW_STOCK = 9;
 
 function StockBadge({ stock }) {
 
@@ -121,15 +120,7 @@ export default function ManageItemsScreen({ tipo }) {
 
             key: "categoria",
             label: "Categoría",
-            render: (row) => {
-
-                const category = findCategory(row.tipo, row.categoria);
-
-                const sub = findSubcategory(row.tipo, row.categoria, row.subcategoria);
-
-                return [category?.label ?? row.categoria, sub?.label].filter(Boolean).join(" > ");
-
-            },
+            render: (row) => categoryLabel(row),
 
         },
 
@@ -137,7 +128,9 @@ export default function ManageItemsScreen({ tipo }) {
 
         ...(tipo === "productos"
 
-            ? [{ key: "stock", label: "Stock", render: (row) => <StockBadge stock={row.stock} /> }]
+            ? [{ key: "stock", label: "Stock", render: (row) => row.variants?.length
+                ? row.variants.map((v) => <div key={v.id}>{v.name}: <StockBadge stock={v.stock} /></div>)
+                : <StockBadge stock={row.stock} /> }]
 
             : []),
 

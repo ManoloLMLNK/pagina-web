@@ -16,7 +16,14 @@ import ProfileScreen from "./pages/Profile/ProfileScreen";
 import SettingsScreen from "./pages/Settings/SettingsScreen";
 import CartScreen from "./pages/Cart/CartScreen";
 import ManageItemsScreen from "./pages/Manage/ManageItemsScreen";
-import MyCompanyScreen from "./pages/MyCompany/MyCompanyScreen";
+import MiCompanyScreen from "./pages/MyCompany/MiCompanyScreen";
+import DashboardScreen from "./pages/Dashboard/DashboardScreen";
+import CategoriesScreen from "./pages/Categories/CategoriesScreen";
+import SalesScreen from "./pages/Sales/SalesScreen";
+import QuotesScreen from "./pages/Quotes/QuotesScreen";
+import MessagesScreen from "./pages/Messages/MessagesScreen";
+import ReportsScreen from "./pages/Reports/ReportsScreen";
+import ModerationScreen from "./pages/Moderation/ModerationScreen";
 
 function App() {
 
@@ -54,12 +61,48 @@ function App() {
 
               <Route
 
+                path="/panel"
+                element={
+
+                  <ProtectedRoute allowedRoles={["vendedor", "administrador"]}>
+
+                    <DashboardScreen />
+
+                  </ProtectedRoute>
+
+                }
+
+              />
+
+              <Route
+
                 path="/perfil"
                 element={
 
                   <ProtectedRoute>
 
                     <ProfileScreen />
+
+                  </ProtectedRoute>
+
+                }
+
+              />
+
+              <Route path="/reportes" element={<ProtectedRoute allowedRoles={["vendedor", "administrador"]}><ReportsScreen /></ProtectedRoute>} />
+              <Route path="/moderacion" element={<ProtectedRoute allowedRoles={["vendedor", "administrador"]}><ModerationScreen /></ProtectedRoute>} />
+              <Route path="/mensajes" element={<ProtectedRoute><MessagesScreen /></ProtectedRoute>} />
+
+              <Route path="/cotizaciones" element={<ProtectedRoute><QuotesScreen /></ProtectedRoute>} />
+
+              <Route
+
+                path="/ventas"
+                element={
+
+                  <ProtectedRoute allowedRoles={["vendedor", "administrador"]}>
+
+                    <SalesScreen />
 
                   </ProtectedRoute>
 
@@ -113,13 +156,28 @@ function App() {
               />
 
               <Route
+  
+                path="/categorias"
+                element={
+    
+                  <ProtectedRoute allowedRoles={["administrador"]}>
+      
+                    <CategoriesScreen />
+    
+                  </ProtectedRoute>
+  
+                }
+
+            />
+
+              <Route
 
                 path="/mi-empresa"
                 element={
 
                   <ProtectedRoute allowedRoles={["vendedor", "administrador"]}>
 
-                    <MyCompanyScreen />
+                    <MiCompanyScreen />
 
                   </ProtectedRoute>
 
@@ -143,93 +201,21 @@ function App() {
               />
 
               <Route
-              
-                path="/productos"
+                path="/productos/*"
                 element={
-                  
                   <ProtectedRoute>
-                  
                     <CatalogScreen tipo="productos" />
-                  
                   </ProtectedRoute>
-                
                 }
-              
-              />
-              
-              <Route
-                
-                path="/productos/:categoria"
-                element={
-                
-                  <ProtectedRoute>
-                  
-                    <CatalogScreen tipo="productos" />
-                  
-                  </ProtectedRoute>
-                
-                }
-              
-              />
-              
-              <Route
-                
-                path="/productos/:categoria/:subcategoria"
-                element={
-                  
-                  <ProtectedRoute>
-                  
-                    <CatalogScreen tipo="productos" />
-                  
-                  </ProtectedRoute>
-                
-                }
-              
               />
 
               <Route
-                
-                path="/servicios"
+                path="/servicios/*"
                 element={
-                  
                   <ProtectedRoute>
-                  
                     <CatalogScreen tipo="servicios" />
-                  
                   </ProtectedRoute>
-                
                 }
-              
-              />
-              
-              <Route
-                
-                path="/servicios/:categoria"
-                element={
-                  
-                  <ProtectedRoute>
-                  
-                    <CatalogScreen tipo="servicios" />
-                  
-                  </ProtectedRoute>
-                
-                }
-              
-              />
-              
-              <Route
-              
-                path="/servicios/:categoria/:subcategoria"
-                element={
-                  
-                  <ProtectedRoute>
-                  
-                    <CatalogScreen tipo="servicios" />
-                  
-                  </ProtectedRoute>
-                
-                }
-              
               />
 
               <Route

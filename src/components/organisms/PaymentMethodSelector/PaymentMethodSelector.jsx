@@ -1,9 +1,11 @@
 import { Box, Button, FormControlLabel, Paper, Radio, RadioGroup, Typography } from "@mui/material";
 import CreditCardOutlined from "@mui/icons-material/CreditCardOutlined";
+import AccountBalanceOutlined from "@mui/icons-material/AccountBalanceOutlined";
 
 const METHODS = [
 
     {id: "tarjeta", label: "Tarjeta de Crédito/Débito", icon: <CreditCardOutlined />},
+    {id: "transferencia", label: "Transferencia Bancaria", icon: <AccountBalanceOutlined />},
 
 ];
 
@@ -30,7 +32,7 @@ export default function PaymentMethodSelector({value, onChange, onContinue}) {
                         sx = {{
 
                             display: "flex",
-                            alingItems: "center",
+                            alignItems: "center",
                             gap: 1,
                             p: 1,
                             mb: 1.5,

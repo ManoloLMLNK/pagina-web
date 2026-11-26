@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatRut, isValidRut } from "../../utils/rut";
+import { homePathFor } from "../../utils/homePath";
 import { useAuth } from "../../context/AuthContext";
 import LoginTemplate from "../../components/templates/LoginTemplate/LoginTemplate";
 import LoginBrand from "../../components/organisms/LoginBrand/LoginBrand";
 import LoginForm from "../../components/organisms/LoginForm/LoginForm";
 import "../../styles/Login.css";
 
-//la logica estado, validacion, inicio de sesion
+//la logica estado validacion inicio de sesion
 
 export default function LoginScreen() {
 
     const navigate = useNavigate();
 
-    const { login } = useAuth();
+    const { login, currentUser } = useAuth();
 
     const [values, setValues] = useState({ rut: "", password: "", remember: false });
 
@@ -26,6 +27,14 @@ export default function LoginScreen() {
         document.title = "CompraYa - Iniciar Sesión";
 
     }, []);
+
+    //si ya hay una sesion iniciada no se muestra el login va directo a su pantalla de inicio
+
+    useEffect(() => {
+
+        if (currentUser) navigate(homePathFor(currentUser), { replace: true });
+
+    }, [currentUser, navigate]);
 
     const handleChange = (field) => (e) => {
 
@@ -77,9 +86,11 @@ export default function LoginScreen() {
 
             }
 
-            console.log("Login exitoso, usuario:", result.user);
+            //solo se muestra el RUT y el rol nunca los demas datos de la persona
 
-            navigate("/home");
+            console.log("Login exitoso:", { rut: result.user.rut, role: result.user.role });
+
+            navigate(homePathFor(result.user));
 
         } finally {
 

@@ -4,12 +4,16 @@ export function sanitizeName(value) {
 
 }
 
+const MAX_PHONE_DIGITS = 11;
+
+//un + solo puede ir de primer caracter el resto son solo numeros
+
 export function sanitizePhone(value) {
 
-    const hasPlus = value.startsWith("+");
+    const text = String(value ?? "").trim();
 
-    const digits = value.replace(/\D/g, "");
+    const digits = text.replace(/\D/g, "").slice(0, MAX_PHONE_DIGITS);
 
-    return hasPlus ? `+${digits}` : digits
+    return text.startsWith("+") ? `+${digits}` : digits;
 
 }

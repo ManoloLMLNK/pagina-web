@@ -1,15 +1,9 @@
 export function formatCLP(value) {
 
-    const number = Number(value) || 0;
+    const amount = Math.round(Number(value) || 0);
 
-    return new Intl.NumberFormat("es-CL", {
+    const digits = String(Math.abs(amount)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-        style: "currency",
-
-        currency: "CLP",
-
-        maximumFractionDigits: 0,
-
-    }).format(number);
+    return `${amount < 0 ? "-" : ""}$${digits}`;
 
 }

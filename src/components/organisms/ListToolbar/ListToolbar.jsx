@@ -1,4 +1,4 @@
-//titulo a la izquierda, buscador al medio y boton "+ Agregar" a la derecha.
+//titulo a la izquierda buscador al medio y boton + Agregar a la derecha
 
 export default function ListToolbar({
 

@@ -8,9 +8,9 @@ import ConfirmDialog from "../../components/ConfirmDialog/Confirmdialog";
 import { useStoredList } from "../../hooks/useStoredList";
 import { matchesSearch } from "../../utils/search";
 import "../../styles/Admin.css";
-import { useAuth } from "../../context/AuthContext";
+import { findContactConflict, useAuth } from "../../context/AuthContext";
 
-//las columnas de la tabla para quitar, agregar o reordenar, se edita esta lista
+//las columnas de la tabla para quitar agregar o reordenar se edita esta lista
 
 const COLUMNS = [
 
@@ -30,7 +30,7 @@ const ROLES = [
 
 ];
 
-//junta los datos de la fila con los de la cuenta (si tiene) para llenar el formulario de edicion
+//junta los datos de la fila con los de la cuenta para llenar el formulario de edicion
 //asi no se pierden los telefonos y direcciones extra de una cuenta
 
 function buildEditValues(row, users) {
@@ -51,11 +51,13 @@ function buildEditValues(row, users) {
 
 }
 
-//la lista de clientes (solo para administradores)
+//la lista de clientes
 
 export default function ClientesScreen() {
 
     const { items: clientes, addItem, updateItem, removeItem } = useStoredList("compraya_clientes");
+
+    const { items: empresas } = useStoredList("compraya_empresas");
 
     const [search, setSearch] = useState("");
 
@@ -65,8 +67,6 @@ export default function ClientesScreen() {
 
     const [notice, setNotice] = useState("");
 
-    //la persona q se esta editando (con sus datos ya listos para el formulario)
-
     const [editing, setEditing] = useState(null);
 
     useEffect(() => {
@@ -75,7 +75,7 @@ export default function ClientesScreen() {
 
     }, []);
 
-    const { users, currentUser, changeUserRole, removeUser, updateProfile } = useAuth();
+    const { users, currentUser, changeUserRoles, removeUser, updateProfile } = useAuth();
 
     //las cuentas registradas q no estan en la lista de clientes tambien se muestran
 
@@ -97,6 +97,15 @@ export default function ClientesScreen() {
 
     const visibleClientes = [...clientes, ...accountRows].filter((c) => matchesSearch([c.nombre, c.rut], search));
 
+    //todos los correos y telefonos ya usados las cuentas y los clientes de la lista
+
+    const knownContacts = [
+
+        ...users,
+        ...clientes.map((c) => ({ rut: c.rut, email: c.correo, phones: c.telefono ? [c.telefono] : [] })),
+
+    ];
+
     //la columna Rol un selector si la persona tiene cuenta
 
     const columns = [
@@ -113,23 +122,42 @@ export default function ClientesScreen() {
 
                 if (!account) return "Sin cuenta";
 
+                const roles = account.roles ?? [account.role];
+
+                const isSelf = account.rut === currentUser?.rut;
+
                 return (
 
-                    <select
-
-                        value={account.role}
-                        disabled={account.rut === currentUser?.rut}
-                        onChange={(e) => changeUserRole(account.rut, e.target.value)}
-
-                    >
+                    <span>
 
                         {ROLES.map((r) => (
 
-                            <option key={r.value} value={r.value}>{r.label}</option>
+                            <label key={r.value} style={{ display: "inline-block", marginRight: 8, whiteSpace: "nowrap" }}>
+
+                                <input
+
+                                    type="checkbox"
+                                    checked={roles.includes(r.value)}
+                                    disabled={isSelf}
+                                    onChange={(e) => {
+
+                                        const next = e.target.checked ? [...roles, r.value] : roles.filter((x) => x !== r.value);
+
+                                        const result = changeUserRoles(account.rut, next);
+
+                                        if (!result.ok) setNotice(result.error);
+
+                                    }}
+
+                                />{" "}
+
+                                {r.label}
+
+                            </label>
 
                         ))}
 
-                    </select>
+                    </span>
 
                 );
 
@@ -147,6 +175,22 @@ export default function ClientesScreen() {
 
         }
 
+        //correo y telefono son unicos por persona
+
+        const conflict = findContactConflict(knownContacts, {
+
+            rut: data.rut,
+            email: data.correo,
+            phones: data.telefono ? [data.telefono] : [],
+
+        });
+
+        if (conflict) {
+
+            return { ok: false, field: conflict.field === "phones" ? "telefono" : "correo", error: conflict.error };
+
+        }
+
         const saved = addItem(data);
 
         console.log("Cliente guardado:", saved);
@@ -159,22 +203,62 @@ export default function ClientesScreen() {
 
     const handleSaveEdit = (data) => {
 
-        //si la persona tiene cuenta, se actualiza la cuenta (vale para cualquier rol)
+        //antes de guardar nada el correo y los telefonos no pueden ser de otra persona
 
-        if (users.some((u) => u.rut === editing.rut)) {
+        const conflict = findContactConflict(knownContacts, {
 
-            updateProfile(editing.rut, {
+            rut: editing.rut,
+            email: data.correo,
+            phones: data.phones,
+
+        });
+
+        if (conflict) {
+
+            setNotice(conflict.error);
+
+            return;
+
+        }
+
+        //si la persona tiene cuenta se actualiza la cuenta
+
+        const account = users.find((u) => u.rut === editing.rut);
+
+        if (account) {
+
+            const result = updateProfile(editing.rut, {
 
                 fullName: data.nombre,
                 email: data.correo,
                 phones: data.phones,
                 addresses: data.addresses,
+                empresaId: data.empresaId,
+                cargo: data.cargo,
 
             });
 
+            if (!result.ok) {
+
+                setNotice(result.error);
+
+                return;
+
+            }
+
+            //quien queda asignado a una empresa tambien recibe el rol de vendedor
+
+            const roles = account.roles ?? [account.role];
+
+            if (data.empresaId && !roles.includes("vendedor")) {
+
+                changeUserRoles(editing.rut, [...roles, "vendedor"]);
+
+            }
+
         }
 
-        //y si ademas esta en la lista de clientes, tambien se actualiza ahi
+        //y si ademas esta en la lista de clientes tambien se actualiza ahi
 
         if (!editing.esCuenta) {
 
@@ -268,6 +352,7 @@ export default function ClientesScreen() {
 
                 open={Boolean(editing)}
                 user={editing}
+                empresas={empresas}
                 onClose={() => setEditing(null)}
                 onSave={handleSaveEdit}
 
@@ -294,7 +379,7 @@ export default function ClientesScreen() {
             <ConfirmDialog
 
                 open={Boolean(notice)}
-                title="No se puede eliminar"
+                title="No se pudo completar"
                 message={notice}
                 confirmLabel="Entendido"
                 onConfirm={() => setNotice("")}

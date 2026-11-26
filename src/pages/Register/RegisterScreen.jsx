@@ -5,9 +5,11 @@ import LoginTemplate from "../../components/templates/LoginTemplate/LoginTemplat
 import LoginBrand from "../../components/organisms/LoginBrand/LoginBrand";
 import RegisterForm from '../../components/molecules/RegisterForm/RegisterForm';
 import { createEntry, filledValues } from "../../utils/entries";
+import { addressToString, createAddress, filledAddresses, validateAddresses } from "../../utils/addresses";
 import { formatRut, isSuspiciousRut, isValidRut } from "../../utils/rut";
 import { sanitizeName } from "../../utils/text";
-import { isValidEmail, isValidPhone } from "../../utils/validators";
+import { formatDateInput, isValidEmail, isValidPhone } from "../../utils/validators";
+import { birthDateError } from "../../utils/age";
 import "../../styles/Login.css";
 import "../../styles/Register.css";
 
@@ -73,6 +75,10 @@ function validate(values, phones, addresses) {
 
     else if (!isValidEmail(values.email)) errors.email = "Ingrese un correo válido.";
 
+    const birthError = birthDateError(values.birthDate);
+
+    if (birthError) errors.birthDate = birthError;
+
     const phoneErrors = validateEntries(phones, {
 
         required: true,
@@ -84,16 +90,9 @@ function validate(values, phones, addresses) {
 
     if (Object.keys(phoneErrors).length > 0) errors.phones = phoneErrors;
 
-    //la direccion es opcional si se escribe, tiene q ser una direccion completa
+    //el cliente debe tener al menos una direccion de despacho
 
-    const addressErrors = validateEntries(addresses, {
-
-        required: false,
-        isValid: (value) => value.length >= 5,
-        invalidMessage: "Ingrese una dirección completa.",
-        duplicateMessage: "Esta dirección ya está agregada.",
-
-    });
+    const addressErrors = validateAddresses(addresses, { required: true });
 
     if (Object.keys(addressErrors).length > 0) errors.addresses = addressErrors;
 
@@ -109,7 +108,7 @@ function validate(values, phones, addresses) {
 
 }
 
-//aqui esta la logica del registro estado, validacion, crear la cuenta
+//aqui esta la logica del registro estado validacion crear la cuenta
 
 export default function RegisterScreen() {
 
@@ -122,16 +121,17 @@ export default function RegisterScreen() {
         rut: "",
         fullName: "",
         email: "",
+        birthDate: "",
         password: "",
         confirmPassword: "",
 
     });
 
-    //los telefonos y las direcciones son listas de casillas parten con una sola
+    //los telefonos son una lista de casillas las direcciones una lista de calle region comuna
 
     const [phones, setPhones] = useState(() => [createEntry()]);
 
-    const [addresses, setAddresses] = useState(() => [createEntry()]);
+    const [addresses, setAddresses] = useState(() => [createAddress()]);
 
     const [errors, setErrors] = useState({});
 
@@ -143,7 +143,7 @@ export default function RegisterScreen() {
 
     }, []);
 
-    // Devuelve una funcion distinta segun el campo, y limpia lo que no se puede escribir.
+    //devuelve una funcion distinta segun el campo y limpia lo q no se puede escribir
 
     const handleChange = (field) => (e) => {
 
@@ -152,6 +152,8 @@ export default function RegisterScreen() {
         if (field === "rut") value = formatRut(value);
 
         if (field === "fullName") value = sanitizeName(value);
+
+        if (field === "birthDate") value = formatDateInput(value);
 
         setValues((prev) => ({ ...prev, [field]: value }));
 
@@ -175,9 +177,29 @@ export default function RegisterScreen() {
 
     };
 
+    //el servidor avisa cual campo choca rut correo o un telefono repetido
+
+    const showRegisterError = (result) => {
+
+        if (result.field === "phones") {
+
+            const entry = phones.find((p) => p.value.trim() === String(result.value).trim());
+
+            setErrors({ phones: { [(entry ?? phones[0]).id]: result.error } });
+
+            return;
+
+        }
+
+        setErrors({ [result.field ?? "rut"]: result.error });
+
+    };
+
     const handleSubmit = async (e) => {
 
         e.preventDefault();
+
+        const finalAddresses = filledAddresses(addresses).map(addressToString);
 
         //la contrasena nunca se muestra en consola
 
@@ -187,7 +209,7 @@ export default function RegisterScreen() {
             password: "********",
             confirmPassword: "********",
             phones: filledValues(phones),
-            addresses: filledValues(addresses),
+            addresses: finalAddresses,
 
         });
 
@@ -212,8 +234,9 @@ export default function RegisterScreen() {
                 rut: values.rut,
                 fullName: values.fullName.trim(),
                 email: values.email.trim(),
+                birthDate: values.birthDate,
                 phones: filledValues(phones),
-                addresses: filledValues(addresses),
+                addresses: finalAddresses,
                 password: values.password,
 
             });
@@ -222,7 +245,7 @@ export default function RegisterScreen() {
 
                 console.log("Registro fallido:", result.error);
 
-                setErrors({ rut: result.error });
+                showRegisterError(result);
 
                 return;
 

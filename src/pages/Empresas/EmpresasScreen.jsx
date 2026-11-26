@@ -10,13 +10,15 @@ import "../../styles/Admin.css";
 import { useAuth } from "../../context/AuthContext";
 import { sameRut } from "../../utils/rutMatch";
 
-//las columnas de la tabla, para quitar, agregar o reordenar, se edita esta lista
+//las columnas de la tabla, para quitar agregar o reordenar se edita esta lista
 
 const COLUMNS = [
 
     { key: "nombre", label: "Nombre" },
 
     { key: "rut", label: "Rut" },
+
+    { key: "tipoBien", label: "Tipo de bien" },
 
     { key: "telefono", label: "Teléfono" },
 
@@ -36,7 +38,7 @@ const ROLE_LABELS = {
 
 };
 
-//la lista de empresas (solo para administradores)
+//la lista de empresas
 
 export default function EmpresasScreen() {
 
@@ -46,7 +48,7 @@ export default function EmpresasScreen() {
 
     const [dialogOpen, setDialogOpen] = useState(false);
 
-    //la empresa q se esta editando (null cuando se esta agregando una nueva)
+    //la empresa q se esta editando
 
     const [editing, setEditing] = useState(null);
 
@@ -90,6 +92,22 @@ export default function EmpresasScreen() {
 
         },
 
+        {
+
+            key: "empleados",
+            label: "Empleados",
+            render: (row) => {
+
+                const staff = users.filter((u) => u.empresaId !== undefined && u.empresaId !== "" && String(u.empresaId) === String(row.id));
+
+                if (staff.length === 0) return "—";
+
+                return staff.map((u) => (u.cargo ? `${u.fullName} (${u.cargo})` : u.fullName)).join(", ");
+
+            },
+
+        },
+
     ];
 
     useEffect(() => {
@@ -126,7 +144,7 @@ export default function EmpresasScreen() {
 
     const handleSave = (data) => {
 
-        //el rut no se puede repetir (si se edita, se ignora la propia empresa)
+        //el rut no se puede repetir
 
         if (empresas.some((e) => e.rut === data.rut && e.id !== editing?.id)) {
 

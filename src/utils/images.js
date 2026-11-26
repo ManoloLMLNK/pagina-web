@@ -34,7 +34,7 @@ export function fileToDataUrl(file, maxSize = 600, quality = 0.7) {
 
                 const ctx = canvas.getContext("2d");
 
-                //fondo blanco, para q las imagenes con transparencia no se vean negras
+                //fondo blanco para q las imagenes cn transparencia no se vean niggas
 
                 ctx.fillStyle = "#ffffff";
 

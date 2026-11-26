@@ -1,95 +1,25 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import {useCart} from "../context/CartContext";
-import {formatCLP} from "../utils/currency";
 import Sidebar from "./Sidebar";
 import AccountMenu from "./organisms/AccountMenu/AccountMenu";
 import CartDrawer from "./organisms/CartDrawer/CartDrawer";
+import ItemCard from "./molecules/ItemCard/ItemCard";
 import "./Home.css";
 import logo from "../assets/logo.png";
-import casaIcon from "../assets/icons/casa.png";
-import monitorIcon from "../assets/icons/monitor.png";
 import lupaIcon from "../assets/icons/lupa.png";
 import carritoIcon from "../assets/icons/carrito.png";
 import campanaIcon from "../assets/icons/campana.png";
 import CheckoutPanel from "./organisms/CheckoutPanel/CheckoutPanel";
-import { CATEGORIES, getItems } from "../data/catalog";
+import { getCategories, getItems } from "../data/catalog";
 
-//esto es para reemplazar el backend ya q el profe dijo q aun no
-//conectemos la base de datos, a futuro habra q eliminar o editar estas constantes
+//esto es para reemplazar el backend ya q el profe dijo q aun no (ahora si tenemos permiso)
+//conectemos la base de datos a futuro habra q eliminar o editar estas cosas
 //sera para añadir productos por ahora esta forma
 
 const EMPTY_CATEGORY_SLOTS = 9;
 
 const FEATURED_LIMIT = 10;
-
-const EMPTY_PRODUCT_SLOTS = 6;
-
-const EMPTY_SERVICE_SLOTS = 6;
-
-function ItemCard ({item}) {
-
-    const {addItem} = useCart();
-
-    const navigate = useNavigate();
-
-    return (
-
-        <div
-
-            className = "card"
-            onClick = {() => navigate(`/item/${item.id}`)}
-            style = {{cursor: "pointer"}}
-
-        >
-
-            <div className = "card-image">
-
-                {item.images?.[0] && (
-
-                    <img src = {item.images[0]} alt = {item.name} style = {{width: "100%", height: "100%", objectFit: "cover"}} />
-
-                )}
-
-            </div>
-            
-            <p className = "card-name">{item.name}</p>
-            <p className = "card-rating">
-
-                estrella {item.rating} ({item.reviews})
-
-            </p>
-
-            <div className = "card-footer">
-
-                <span className = "card-price">{formatCLP(item.price)}</span>
-
-                <button
-
-                    className = "add-to-cart"
-                    aria-label = "Agregar al carrito"
-                    onClick = {(e) => {
-
-                        e.stopPropagation();
-
-                        addItem(item);
-
-                    }}
-                
-                >
-
-                    carrito
-
-                </button>
-
-            </div>
-
-        </div>
-
-    );
-
-}
 
 export default function Home() {
 
@@ -249,9 +179,9 @@ export default function Home() {
 
                 </div>
 
-                <div className = "category-row">
+                <div className = "category-row" style = {{flexWrap: "wrap"}}>
 
-                    {CATEGORIES[activeTab].map((cat) => (
+                    {getCategories(activeTab).map((cat) => (
 
                         <div
 
@@ -264,7 +194,15 @@ export default function Home() {
 
                             <div className = "category-icon">
 
-                                <img src = {cat.icon} alt = "" style = {{width: 40, height: 40, objectFit: "contain"}} />
+                                {typeof cat.icon === "string" && cat.icon.includes("/") ? (
+
+                                    <img src = {cat.icon} alt = "" style = {{width: 40, height: 40, objectFit: "contain"}} />
+
+                                ) : (
+
+                                    cat.icon
+
+                                )}
 
                             </div>
 
@@ -274,7 +212,7 @@ export default function Home() {
 
                     ))}
 
-                    {Array.from({length: EMPTY_CATEGORY_SLOTS}).map((_, i) => (
+                    {Array.from({length: Math.max(0, EMPTY_CATEGORY_SLOTS - getCategories(activeTab).length)}).map((_, i) => (
 
                         <div className = "category-item placeholder" key = {`cat-empty-${i}`} />
 
@@ -285,13 +223,14 @@ export default function Home() {
                 <div className = "section-header">
 
                     <h2 className = "section-title">Productos Destacados</h2>
-                    <span className = "see-noe">Ver más Productos</span>
+                    
+                    <span className = "see-more">Ver más Productos</span>
 
                 </div>
 
                 <div className = "card-row">
 
-                    {featuredProducts.map((p) => ( //posible error
+                    {featuredProducts.map((p) => (
 
                         <ItemCard key = {p.id} item = {p} />
 

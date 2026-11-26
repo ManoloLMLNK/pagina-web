@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import FormDialog from "../FormDialog/FormDialog";
 import FormField from "../../molecules/FormField/FormField";
 import MultiTextField from "../../molecules/MultiTextField/MultiTextField";
+import AddressListField from "../../molecules/AddressListField/AddressListField";
+import { addressToString, createAddress, filledAddresses, stringToAddress, validateAddresses } from "../../../utils/addresses";
 import { createEntries, filledValues } from "../../../utils/entries";
 import { sanitizeName, sanitizePhone } from "../../../utils/text";
 import { validateProfile } from "../../../utils/profileValidation";
@@ -14,12 +16,16 @@ const withOne = (list) => (list.length > 0 ? list : [""]);
 
 const FIELD_STYLE = { marginBottom: 16 };
 
-//el administrador edita los datos de un cliente, vendedor o usuario
-//(el rut y la contraseña no se pueden cambiar desde aqui)
+//valor especial del selector para sin empresa
 
-export default function UserEditDialog({ open, user, onClose, onSave }) {
+const NO_COMPANY = "none";
 
-    const [values, setValues] = useState({ nombre: "", correo: "" });
+//el administrador edita los datos de un cliente vendedor o usuario
+//tambien puede asignar a la persona a una empresa con su cargo
+
+export default function UserEditDialog({ open, user, empresas = [], onClose, onSave }) {
+
+    const [values, setValues] = useState({ nombre: "", correo: "", empresaId: NO_COMPANY, cargo: "" });
 
     const [phones, setPhones] = useState([]);
 
@@ -27,17 +33,38 @@ export default function UserEditDialog({ open, user, onClose, onSave }) {
 
     const [errors, setErrors] = useState({});
 
-    //cada vez q se abre, el formulario aparece con los datos actuales de la persona
+    const companyOptions = [
+
+        { value: NO_COMPANY, label: "Sin empresa" },
+
+        ...empresas.map((e) => ({ value: e.id, label: e.nombre })),
+
+    ];
+
+    //cada vez q se abre el formulario aparece cn los datos actuales de la persona
 
     useEffect(() => {
 
         if (open && user) {
 
-            setValues({ nombre: user.nombre ?? "", correo: user.correo ?? "" });
+            //si la empresa asignada ya no existe queda sin empresa
+
+            const exists = empresas.some((e) => String(e.id) === String(user.empresaId));
+
+            setValues({
+
+                nombre: user.nombre ?? "",
+                correo: user.correo ?? "",
+                empresaId: exists ? empresas.find((e) => String(e.id) === String(user.empresaId)).id : NO_COMPANY,
+                cargo: exists ? user.cargo ?? "" : "",
+
+            });
 
             setPhones(createEntries(withOne(user.phones ?? [])));
 
-            setAddresses(createEntries(withOne(user.addresses ?? [])));
+            const saved = (user.addresses ?? []).map(stringToAddress);
+
+            setAddresses(saved.length > 0 ? saved : [createAddress()]);
 
             setErrors({});
 
@@ -58,6 +85,22 @@ export default function UserEditDialog({ open, user, onClose, onSave }) {
         setValues((prev) => ({ ...prev, correo: e.target.value }));
 
         setErrors((prev) => ({ ...prev, email: undefined }));
+
+    };
+
+    //al quedar sin empresa el cargo se borra
+
+    const handleCompanyChange = (e) => {
+
+        const empresaId = e.target.value;
+
+        setValues((prev) => ({ ...prev, empresaId, cargo: empresaId === NO_COMPANY ? "" : prev.cargo }));
+
+    };
+
+    const handleCargoChange = (e) => {
+
+        setValues((prev) => ({ ...prev, cargo: e.target.value }));
 
     };
 
@@ -83,7 +126,11 @@ export default function UserEditDialog({ open, user, onClose, onSave }) {
 
         //son las mismas validaciones del registro
 
-        const newErrors = validateProfile({ fullName: values.nombre, email: values.correo }, phones, addresses);
+        const newErrors = validateProfile({ fullName: values.nombre, email: values.correo }, phones, []);
+
+        const addressErrors = validateAddresses(addresses, { required: false });
+
+        if (Object.keys(addressErrors).length > 0) newErrors.addresses = addressErrors;
 
         if (Object.keys(newErrors).length > 0) {
 
@@ -93,12 +140,16 @@ export default function UserEditDialog({ open, user, onClose, onSave }) {
 
         }
 
+        const hasCompany = values.empresaId !== NO_COMPANY;
+
         onSave({
 
             nombre: values.nombre.trim(),
             correo: values.correo.trim(),
             phones: filledValues(phones),
-            addresses: filledValues(addresses),
+            addresses: filledAddresses(addresses).map(addressToString),
+            empresaId: hasCompany ? values.empresaId : "",
+            cargo: hasCompany ? values.cargo.trim() : "",
 
         });
 
@@ -117,7 +168,7 @@ export default function UserEditDialog({ open, user, onClose, onSave }) {
 
         >
 
-            <p style={FIELD_STYLE}><strong>RUT:</strong> {user?.rut} (no se puede modificar)</p>
+            <p style={FIELD_STYLE}><strong>RUT:</strong> {user?.rut}</p>
 
             <div style={FIELD_STYLE}>
 
@@ -161,7 +212,7 @@ export default function UserEditDialog({ open, user, onClose, onSave }) {
                     entryName="teléfono"
                     type="tel"
                     inputMode="tel"
-                    placeholder="Ej: +569 94738390"
+                    placeholder="Ej: +56994738390"
                     sanitize={sanitizePhone}
                     entries={phones}
                     onChange={handlePhonesChange}
@@ -171,18 +222,55 @@ export default function UserEditDialog({ open, user, onClose, onSave }) {
 
             </div>
 
-            <MultiTextField
+            <div style={FIELD_STYLE}>
 
-                id="user-address"
-                label="Dirección"
-                entryName="dirección"
-                placeholder="Ej: Av. Francia 12"
-                maxLength={120}
-                entries={addresses}
-                onChange={handleAddressesChange}
-                errors={errors.addresses}
+                <AddressListField
 
-            />
+                    idPrefix="user-address"
+                    addresses={addresses}
+                    onChange={handleAddressesChange}
+                    errors={errors.addresses}
+
+                />
+
+            </div>
+
+            <div className="form-dialog__section">Empresa</div>
+
+            <p style={{ fontSize: "0.85rem", margin: "0 0 12px" }}>
+
+                Al asignar una empresa, la persona también recibe el rol de vendedor para ver &quot;Mi Empresa&quot;.
+
+            </p>
+
+            <div style={FIELD_STYLE}>
+
+                <FormField
+
+                    id="user-empresa"
+                    label="Empresa donde trabaja"
+                    placeholder="Selecciona empresa"
+                    options={companyOptions}
+                    value={values.empresaId}
+                    onChange={handleCompanyChange}
+
+                />
+
+            </div>
+
+            {values.empresaId !== NO_COMPANY && (
+
+                <FormField
+
+                    id="user-cargo"
+                    label="Cargo"
+                    placeholder="Ej: Vendedor de tienda"
+                    value={values.cargo}
+                    onChange={handleCargoChange}
+
+                />
+
+            )}
 
         </FormDialog>
 

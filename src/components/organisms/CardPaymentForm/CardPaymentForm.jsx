@@ -3,8 +3,6 @@ import {
 
     Box,
     Button,
-    Checkbox,
-    FormControlLabel,
     IconButton,
     TextField,
     Typography,
@@ -33,14 +31,6 @@ function formatExpiry (value) {
 
 const BRAND_LABELS = {visa: "VISA", mastercard: "MASTERCARD"};
 
-//aunq en figma diga q guarde los datos para una futura compra, legalmente se necesita un
-//permiso y blablabla, y la tontera es rara asi q lo q implementaremos en su lugar
-//es un sistema de compra dentro de la pagina web, y q los datos de la tarjeta
-//se eliminen de la memoria de la pagina, asi no nos quedamos con los datos de
-//tarjeta de los usuarios, y esto es legalmente aceptable y realista jiji
-
-//(estoy cayendo en la locura)
-
 export default function CardPaymentForm ({onBack, onSubmit, loading}) {
 
     const [cardNumber, setCardNumber] = useState("");
@@ -48,8 +38,6 @@ export default function CardPaymentForm ({onBack, onSubmit, loading}) {
     const [expiry, setExpiry] = useState("");
 
     const [cvv, setCvv] = useState("");
-
-    const [remember, setRemember] = useState(false);
 
     const [errors, setErrors] = useState({});
 
@@ -69,7 +57,12 @@ export default function CardPaymentForm ({onBack, onSubmit, loading}) {
 
         if (Object.keys(newErrors).length > 0) return;
 
-        onSubmit();
+        onSubmit({
+
+            last4: cardNumber.replace(/\D/g, "").slice(-4),
+            brand: brand ? BRAND_LABELS[brand] : "",
+
+        });
 
         setCardNumber("");
 
@@ -83,7 +76,7 @@ export default function CardPaymentForm ({onBack, onSubmit, loading}) {
 
         <Box component = "form" onSubmit = {handleSubmit}>
 
-            <Box sx = {{display: "flex", alingItems: "center", gap: 1, mb: 2}}>
+            <Box sx = {{display: "flex", alignItems: "center", gap: 1, mb: 2}}>
 
                 <IconButton onClick = {onBack} size = "small" aria-label = "Volver">
 
@@ -93,7 +86,7 @@ export default function CardPaymentForm ({onBack, onSubmit, loading}) {
 
                 {brand && (
 
-                    <Typography variant = "body2" fontWeigth = {600}>
+                    <Typography variant = "body2" fontWeight = {600}>
 
                         {BRAND_LABELS[brand]}
 
@@ -119,7 +112,7 @@ export default function CardPaymentForm ({onBack, onSubmit, loading}) {
                 error = {Boolean(errors.cardNumber)}
                 helperText = {errors.cardNumber}
                 sx = {{mb: 2}}
-                slotProps = {{htmlInput: {inputMode: "numeric"}}}
+                slotProps = {{htmlInput: {inputMode: "numeric", autoComplete: "off"}}}
 
             />
 
@@ -142,7 +135,7 @@ export default function CardPaymentForm ({onBack, onSubmit, loading}) {
                         onChange = {(e) => setExpiry(formatExpiry(e.target.value))}
                         error = {Boolean(errors.expiry)}
                         helperText = {errors.expiry}
-                        slotProps = {{htmlInput: {inputMode: "numeric"}}}
+                        slotProps = {{htmlInput: {inputMode: "numeric", autoComplete: "off"}}}
 
                     />
 
@@ -165,7 +158,7 @@ export default function CardPaymentForm ({onBack, onSubmit, loading}) {
                         onChange = {(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
                         error = {Boolean(errors.cvv)}
                         helperText = {errors.cvv}
-                        slotProps = {{htmlInput: {inputMode: "numeric"}}}
+                        slotProps = {{htmlInput: {inputMode: "numeric", autoComplete: "off"}}}
 
                     />
 
@@ -173,22 +166,10 @@ export default function CardPaymentForm ({onBack, onSubmit, loading}) {
 
             </Box>
 
-            <FormControlLabel
-
-                control = {
-
-                    <Checkbox checked = {remember} onChange = {(e) => setRemember(e.target.checked)} size = "small" />
-
-
-                }
-
-                label = "Recordar esta tarjeta a futuro" //lo pongo por poner, pero realmente no va a funcionar
-
-            />
-
             <Typography variant = "caption" color = "text.secondary" display = "block" sx = {{mb: 2}}>
 
-                Por seguridad, no guardamos los datos de su tarjeta: solo se usaran para este pago
+                Por seguridad, solo guardamos los últimos 4 dígitos de tu tarjeta para el comprobante.
+                El número completo, la fecha y el CVV nunca se guardan.
 
             </Typography>
 
